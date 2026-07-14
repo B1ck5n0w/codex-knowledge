@@ -1,0 +1,370 @@
+{
+  "created_at": "2026-07-10",
+  "notes": "Seed-Liste fuer Firmenwebseiten-Crawling rund um Geldern. Schippers ist bewusst blockiert.",
+  "companies": [
+    {
+      "name": "moses. Verlag GmbH",
+      "city": "Kempen",
+      "website": "https://www.moses-verlag.de/",
+      "career_urls": [
+        "https://www.moses-verlag.de/Unternehmen/Karriere/",
+        "https://www.moses-verlag.de/Unternehmen/Karriere/Offene-Stellen/"
+      ],
+      "job_urls": [
+        "https://www.moses-verlag.de/moses.-Verlag/Karriere/Offene-Stellen/Ecomm-Management/"
+      ],
+      "priority": "A",
+      "reason": "Echter E-Commerce-Treffer, 30-40 Std., hybrid, gute Pendelregion"
+    },
+    {
+      "name": "bofrost*",
+      "city": "Straelen",
+      "website": "https://www.bofrost.de/",
+      "career_urls": [
+        "https://karriere.bofrost.de/"
+      ],
+      "priority": "A",
+      "reason": "Grosser Direktvertrieb, Internationalitaet, Commerce-/Digitalisierungsbezug"
+    },
+    {
+      "name": "Landgard",
+      "city": "Straelen-Herongen",
+      "website": "https://www.landgard.de/",
+      "career_urls": [
+        "https://karriere.landgard.de/",
+        "https://karriere.landgard.de/karriere-site/fach-fuehrungskraefte"
+      ],
+      "priority": "A",
+      "reason": "B2B/Grosshandel, potenzieller Plattform-/Digital-Commerce-Bedarf"
+    },
+    {
+      "name": "Fressnapf Holding SE",
+      "city": "Krefeld",
+      "website": "https://www.fressnapf.de/",
+      "career_urls": [
+        "https://jobs.fressnapf.com/",
+        "https://jobs.fressnapf.com/de/jobs"
+      ],
+      "priority": "B",
+      "reason": "Grosser Omnichannel-/Retail-Arbeitgeber, Hybrid-Anteil entscheidend"
+    },
+    {
+      "name": "Paradies GmbH",
+      "city": "Neukirchen-Vluyn",
+      "website": "https://www.paradies.de/",
+      "career_urls": [
+        "https://paradies.de/pages/karriere"
+      ],
+      "priority": "B",
+      "reason": "E-Commerce-Aufbau in mittelstaendischem Markenunternehmen"
+    },
+    {
+      "name": "ArtiTree GmbH",
+      "city": "Nettetal",
+      "website": "https://artitree.de/",
+      "priority": "C",
+      "reason": "Nahe Region, Wachstums-/Aufbaukontext, Marketplace-Fokus kritisch"
+    },
+    {
+      "name": "ECOMMERCE ONE",
+      "city": "Krefeld",
+      "website": "https://ecommerceone.com/",
+      "career_urls": [
+        "https://ecommerceone.com/karriere/",
+        "https://ecommerceone.com/career/"
+      ],
+      "priority": "B",
+      "reason": "E-Commerce-SaaS-Umfeld, Rollen genau auf Inhouse/Product-Fit pruefen"
+    },
+    {
+      "name": "Afterbuy",
+      "city": "Krefeld",
+      "website": "https://www.afterbuy.de/",
+      "career_urls": [
+        "https://www.afterbuy.de/jobs/",
+        "https://www.afterbuy.de/karriere/"
+      ],
+      "priority": "B",
+      "reason": "E-Commerce-SaaS-/Plattformumfeld"
+    },
+    {
+      "name": "Veiling Rhein-Maas",
+      "city": "Straelen-Herongen",
+      "website": "https://www.veilingrheinmaas.com/",
+      "career_urls": [
+        "https://karriere.veilingrheinmaas.com/"
+      ],
+      "priority": "B",
+      "reason": "B2B-Handelsplattform/Versteigerungsumfeld, potenziell digitaler Vertriebsbezug"
+    },
+    {
+      "name": "Carl Kuehne KG Werk Straelen",
+      "city": "Straelen-Herongen",
+      "website": "https://www.kuehne.de/",
+      "priority": "C",
+      "reason": "Marken-/Food-Unternehmen in Pendelregion, Digital-/Commerce-Rollen beobachten"
+    },
+    {
+      "name": "Bonduelle Deutschland",
+      "city": "Straelen",
+      "website": "https://www.bonduelle.de/",
+      "priority": "C",
+      "reason": "Food/Marke in Pendelregion, Digital-/Commerce-Rollen beobachten"
+    },
+    {
+      "name": "Walther Faltsysteme",
+      "city": "Kevelaer",
+      "website": "https://www.walther-faltsysteme.de/",
+      "career_urls": [
+        "https://faltbox.com/de/karriere/"
+      ],
+      "priority": "C",
+      "reason": "B2B-Unternehmen in Pendelregion, potenzieller Digital-Sales-/Commerce-Bedarf"
+    },
+    {
+      "name": "ELTEN GmbH",
+      "city": "Uedem",
+      "website": "https://elten.com/",
+      "career_urls": [
+        "https://elten.com/karriere/"
+      ],
+      "priority": "C",
+      "reason": "Markenhersteller in Pendelregion, E-Commerce/Digital Sales moeglich"
+    },
+    {
+      "name": "ZOXS GmbH",
+      "city": "Wesel",
+      "website": "https://www.zoxs.de/",
+      "career_urls": [
+        "https://www.zoxs.de/karriere/"
+      ],
+      "priority": "C",
+      "reason": "E-Commerce-Unternehmen, Pendelzeit kritisch, aber fachlich naheliegend"
+    },
+    {
+      "name": "RZH Rechenzentrum fuer Heilberufe",
+      "city": "Wesel",
+      "website": "https://www.rzh.de/",
+      "career_urls": [
+        "https://www.rzh.de/karriere/"
+      ],
+      "priority": "D",
+      "reason": "Aktueller Arbeitgeberkontext; nur beobachten, falls intern relevant"
+    },
+    {
+      "name": "Nagels Druck",
+      "city": "Kempen",
+      "website": "https://www.nagels.com/",
+      "career_urls": [
+        "https://www.nagels.com/karriere/"
+      ],
+      "priority": "B",
+      "reason": "Internationaler Mittelstaendler in Kempen; digitale Produkte/Ticketing und B2B-Digitalisierung moeglich"
+    },
+    {
+      "name": "Trox GmbH",
+      "city": "Neukirchen-Vluyn",
+      "website": "https://www.trox.de/",
+      "career_urls": [
+        "https://www.trox.de/karriere/"
+      ],
+      "priority": "B",
+      "reason": "Internationaler B2B-Hersteller in Pendelregion; Digital Sales/Product Ownership moeglich"
+    },
+    {
+      "name": "LEMKEN GmbH & Co. KG",
+      "city": "Alpen",
+      "website": "https://lemken.com/",
+      "career_urls": [
+        "https://lemken.com/de-de/karriere"
+      ],
+      "priority": "C",
+      "reason": "B2B-Hersteller mit digitalem Vertriebs-/Servicepotenzial; Pendelzeit pruefen"
+    },
+    {
+      "name": "ABS Safety GmbH",
+      "city": "Kevelaer",
+      "website": "https://www.absturzsicherung.de/",
+      "career_urls": [
+        "https://www.absturzsicherung.de/karriere"
+      ],
+      "priority": "B",
+      "reason": "B2B-Unternehmen in sehr guter Pendelregion; Digital Sales/E-Commerce moeglich"
+    },
+    {
+      "name": "Herbrand Gruppe",
+      "city": "Kevelaer",
+      "website": "https://www.herbrand.de/",
+      "career_urls": [
+        "https://www.herbrand.de/karriere/"
+      ],
+      "priority": "C",
+      "reason": "Regionaler Automotive-/Handelsarbeitgeber; Digital-/CRM-/Commerce-nahe Rollen moeglich"
+    },
+    {
+      "name": "Omexom Deutschland Standort Uedem",
+      "city": "Uedem",
+      "website": "https://www.omexom.de/",
+      "career_urls": [
+        "https://www.omexom.de/karriere/"
+      ],
+      "priority": "D",
+      "reason": "Regionaler Arbeitgeber mit digitalem Projektumfeld, aber wenig Commerce-Fit"
+    },
+    {
+      "name": "Silesia Gerhard Hanke",
+      "city": "Kalkar",
+      "website": "https://www.silesia.com/",
+      "career_urls": [
+        "https://www.silesia.com/karriere/"
+      ],
+      "priority": "C",
+      "reason": "Internationaler Food-/B2B-Hersteller in Pendelregion; Digital Sales/CRM moeglich"
+    },
+    {
+      "name": "Kersia Deutschland",
+      "city": "Wachtendonk",
+      "website": "https://www.kersia-group.com/",
+      "career_urls": [
+        "https://www.kersia-group.com/careers/"
+      ],
+      "priority": "C",
+      "reason": "B2B-Unternehmen in Pendelregion; Digital Sales/Customer Portal moeglich"
+    },
+    {
+      "name": "Sauels Gruppe",
+      "city": "Kempen",
+      "website": "https://www.sauels.de/",
+      "career_urls": [
+        "https://www.sauels.de/karriere/"
+      ],
+      "priority": "C",
+      "reason": "Regionaler Food-/Markenarbeitgeber; Digital-/Commerce-nahe Rollen beobachten"
+    },
+    {
+      "name": "Canon Production Printing Netherlands",
+      "city": "Venlo",
+      "website": "https://cpp.canon/",
+      "career_urls": [
+        "https://cpp.canon/careers/"
+      ],
+      "priority": "C",
+      "reason": "Grosser Tech-Arbeitgeber in Venlo; Product-/Digital-Rollen moeglich, Commerce-Fit pruefen"
+    },
+    {
+      "name": "vidaXL",
+      "city": "Venlo",
+      "website": "https://www.vidaxl.com/",
+      "career_urls": [
+        "https://careers.vidaxl.com/"
+      ],
+      "priority": "A",
+      "reason": "E-Commerce-Unternehmen in Venlo; fachlich sehr relevant, Pendel-/Hybrid-Fit pruefen"
+    },
+    {
+      "name": "Redcare Pharmacy",
+      "city": "Sevenum",
+      "website": "https://www.redcare-pharmacy.com/",
+      "career_urls": [
+        "https://www.redcare-pharmacy.com/career/"
+      ],
+      "priority": "B",
+      "reason": "Sehr starker E-Commerce-/Digital-Health-Arbeitgeber; Pendelzeit wahrscheinlich grenzwertig, Hybrid wichtig"
+    },
+    {
+      "name": "Leolux",
+      "city": "Venlo",
+      "website": "https://www.leolux.com/",
+      "career_urls": [
+        "https://www.leolux.com/nl/werken-bij"
+      ],
+      "priority": "C",
+      "reason": "Markenhersteller in Venlo; Digital-/Commerce-Rollen moeglich"
+    },
+    {
+      "name": "Seacon Logistics",
+      "city": "Venlo",
+      "website": "https://www.seaconlogistics.com/",
+      "career_urls": [
+        "https://www.seaconlogistics.com/careers/"
+      ],
+      "priority": "D",
+      "reason": "Digital-/Plattformbezug moeglich, aber kein klarer Commerce-Fokus"
+    },
+    {
+      "name": "Belden",
+      "city": "Venlo",
+      "website": "https://www.belden.com/",
+      "career_urls": [
+        "https://www.belden.com/about/careers"
+      ],
+      "priority": "C",
+      "reason": "Tech-/B2B-Arbeitgeber in Venlo; Digital Product/Digital Sales moeglich"
+    },
+    {
+      "name": "Ewals Cargo Care",
+      "city": "Tegelen",
+      "website": "https://www.ewals.com/",
+      "career_urls": [
+        "https://www.ewals.com/careers/"
+      ],
+      "priority": "D",
+      "reason": "Logistik/Digital-Plattform moeglich, Commerce-Fit eher schwach"
+    },
+    {
+      "name": "Scheuten Glas",
+      "city": "Venlo",
+      "website": "https://www.scheuten.com/",
+      "career_urls": [
+        "https://www.scheuten.com/careers/"
+      ],
+      "priority": "D",
+      "reason": "B2B-Hersteller in Venlo; Digital-Sales-Longshot"
+    },
+    {
+      "name": "Office Depot Europe",
+      "city": "Venlo",
+      "website": "https://www.officedepot.eu/",
+      "career_urls": [
+        "https://www.officedepot.eu/careers/"
+      ],
+      "priority": "C",
+      "reason": "B2B-Handels-/E-Commerce-Bezug moeglich; Standort-/Aktivitaetsstand pruefen"
+    },
+    {
+      "name": "Weyers GmbH",
+      "city": "Kevelaer",
+      "website": "https://www.weyers.com/",
+      "career_urls": [
+        "https://www.weyers.com/karriere/"
+      ],
+      "priority": "C",
+      "reason": "Regionaler Mittelstand; Digital-/B2B-Sales-Potenzial pruefen"
+    },
+    {
+      "name": "Janßen Group",
+      "city": "Kevelaer",
+      "website": "https://www.janssen-group.com/",
+      "career_urls": [
+        "https://www.janssen-group.com/karriere/"
+      ],
+      "priority": "C",
+      "reason": "Regionaler B2B-/Industriearbeitgeber; Digital-Sales-Longshot"
+    },
+    {
+      "name": "Coolblue Deutschland / NRW",
+      "city": "NRW / hybrid-relevant",
+      "website": "https://www.coolblue.de/",
+      "career_urls": [
+        "https://www.coolblue.de/jobs"
+      ],
+      "priority": "D",
+      "reason": "E-Commerce-Arbeitgeber, aber regional nur bei Remote/Hybrid relevant"
+    }
+  ],
+  "blocked_companies": [
+    "Schippers",
+    "MS Schippers",
+    "Schippers GmbH"
+  ]
+}

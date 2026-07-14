@@ -1,0 +1,123 @@
+{
+  "profile": "Christian Derix - E-Commerce-Leitung / Digital Commerce",
+  "created_at": "2026-07-10",
+  "last_run_at": "2026-07-13",
+  "jobs": [
+    {
+      "id": "stepstone-paradies-ecommerce-manager-shopify-marketplaetze-13898150",
+      "company": "Paradies GmbH",
+      "location": "Neukirchen-Vluyn",
+      "title": "E-Commerce Manager (m/w/d) fuer Shopify und Marktplaetze",
+      "url": "https://www.stepstone.de/stellenangebote--E-Commerce-Manager-m-w-d-fuer-Shopify-und-Marktplaetze-Neukirchen-Vluyn-Paradies-GmbH--13733444-inline.html",
+      "priority": "B",
+      "status": "seen",
+      "source": "Jobboard-Fallback",
+      "published_at": "2026-03-06",
+      "notes": "Am 2026-07-13 erneut ueber StepStone auffindbar; Firmen-Karriereseite lieferte 503 und kein Direktlink war belegbar. Regional interessante Aufbauarbeit, aber Shopify/Marketplace-operativ, ohne klare Fuehrung und mit Gehaltsrisiko."
+    },
+    {
+      "id": "stepstone-artitree-ecommerce-channel-manager-13921443",
+      "company": "ArtiTree GmbH",
+      "location": "Nettetal",
+      "title": "E-Commerce Channel Manager (m/w/d)",
+      "url": "https://www.stepstone.de/stellenangebote--E-Commerce-Channel-Manager-m-w-d-Nettetal-ArtiTree-GmbH--13921443-inline.html",
+      "priority": "C",
+      "status": "not_found_2026-07-13",
+      "notes": "Im aktuellen Lauf nicht erneut belegt; Firmenwebsite lieferte 503. Historischer Treffer war stark Amazon/Listing/Marketplace-lastig."
+    },
+    {
+      "id": "stepstone-fressnapf-senior-expert-solution-architecture-13910291",
+      "company": "Fressnapf Holding SE",
+      "location": "Krefeld",
+      "title": "(Senior) Expert Solution Architecture (m/w/d)",
+      "url": "https://www.stepstone.de/stellenangebote--Senior-Expert-Solution-Architecture-m-w-d-Krefeld-Fressnapf-Holding-SE--13910291-inline.html",
+      "priority": "C",
+      "status": "not_found_2026-07-13",
+      "notes": "Im aktuellen Lauf nicht erneut belegt; Fressnapf-Jobportal lief in Timeouts. Rolle war ohnehin zu architekturlastig."
+    },
+    {
+      "id": "stepstone-turck-senior-product-owner-digital-sales-ecommerce-14243999",
+      "company": "TURCK-Gruppe",
+      "location": "Muelheim an der Ruhr",
+      "title": "Senior Product Owner (m/w/d) Digital Sales / eCommerce",
+      "url": "https://www.stepstone.de/stellenangebote--Senior-Product-Owner-m-w-d-Digital-Sales-eCommerce-Muelheim-an-der-Ruhr-TURCK-Gruppe--14243999-inline.html",
+      "priority": "D",
+      "status": "out_of_scope_2026-07-13",
+      "notes": "Nicht weiterverfolgt: fachlich stark, aber deutlich ausserhalb des Pendelziels."
+    },
+    {
+      "id": "moses-verlag-ecommerce-manager-kempen-ecomm-management",
+      "company": "moses. Verlag GmbH",
+      "location": "Kempen",
+      "title": "E-Commerce Manager*in (m/w/d), Voll-/Teilzeit 30-40 Std., hybrid",
+      "url": "https://www.moses-verlag.de/moses.-Verlag/Karriere/Offene-Stellen/Ecomm-Management/",
+      "priority": "B",
+      "status": "seen",
+      "source": "Firmenwebseite",
+      "work_time": "30-40 Std., hybrides Arbeiten moeglich",
+      "notes": "Interessanter Teilzeit-Sonderfall: echter Firmenlink, Kempen, 30 Stunden moeglich und dadurch gut fuer Nebengewerbe chris-derix.de. Bedenken: starker Marketplace-/Amazon- und operativer Anteil, keine klare Fuehrungsrolle."
+    },
+    {
+      "id": "redcare-sevenum-senior-product-owner-erp-744000101841515",
+      "company": "Redcare Pharmacy",
+      "location": "Sevenum",
+      "title": "Senior Product Owner, ERP (m/f/d)",
+      "url": "https://www.redcare-pharmacy.com/careers/open-jobs/details/744000101841515",
+      "priority": "C",
+      "status": "new",
+      "source": "Firmenwebseite",
+      "published_at": "30+ Days Ago",
+      "work_time": "Vollzeit; kein Remote-/Hybrid-Hinweis auf der Anzeige sichtbar",
+      "notes": "Strategische End-to-End-Verantwortung, ERP-Roadmap, Delivery-Aufbau und Mentoring passen zur Business-IT-Bruecke. Bedenken: Sevenum wahrscheinlich rund 35-45 Minuten, ERP statt Digital Commerce, einschlaegige ERP-Tiefe gefordert."
+    }
+  ],
+  "watchlist_companies": [
+    {
+      "company": "bofrost*",
+      "location": "Straelen",
+      "reason": "Direktvertrieb, Internationalitaet, naheliegender Commerce-/Digitalisierungsbezug"
+    },
+    {
+      "company": "Landgard",
+      "location": "Straelen-Herongen",
+      "reason": "B2B/Grosshandel, potenzieller Plattform-/Digital-Commerce-Bedarf"
+    },
+    {
+      "company": "Fressnapf Holding SE",
+      "location": "Krefeld",
+      "reason": "Grosser Omnichannel-/Retail-Arbeitgeber, Hybrid-Anteil entscheidend"
+    },
+    {
+      "company": "moses. Verlag GmbH",
+      "location": "Kempen",
+      "reason": "Echter Firmenwebseiten-Treffer, 30-40 Std. und Hybrid; Teilzeit/Nebengewerbe-Fit beobachten"
+    },
+    {
+      "company": "Paradies GmbH",
+      "location": "Neukirchen-Vluyn",
+      "reason": "E-Commerce-Aufbau in mittelstaendischem Markenunternehmen"
+    },
+    {
+      "company": "ArtiTree GmbH",
+      "location": "Nettetal",
+      "reason": "Nahe Region, Wachstums-/Aufbaukontext, Marketplace-Fokus kritisch"
+    },
+    {
+      "company": "Redcare Pharmacy",
+      "location": "Sevenum",
+      "reason": "E-Commerce-/Product-Organisation mit Senior- und Lead-Rollen; Pendel- und Hybrid-Fit strikt pruefen"
+    }
+  ],
+  "blocked_companies": [
+    {
+      "company": "Schippers / MS Schippers",
+      "reason": "Christian hat dort bereits gearbeitet"
+    }
+  ],
+  "lower_priority_company_types": [
+    {
+      "type": "Agenturen und klassische Dienstleister",
+      "reason": "Nicht attraktiv, ausser eindeutig strategische inhouse-aehnliche Fuehrungsrolle mit Produkt-/Commerce-Verantwortung"
+    }
+  ]
+}

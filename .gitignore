@@ -1,0 +1,26 @@
+# Persönliche Unterlagen und lokale Arbeitsdaten: in Google Drive, nicht Git
+*.pdf
+*.db
+*.sqlite
+*.sqlite3
+
+# Python und lokale Laufzeitdateien
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Zugangsdaten und lokale Konfiguration
+.env
+.env.*
+*.key
+*.pem
+*.crt
+*.pfx
+*.p12
+
+# Editor- und Betriebssystemdateien
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
