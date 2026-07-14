@@ -32,5 +32,16 @@ Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/sommer-party.git' -T
 Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/freizeitexperten-erp-dev.git' -Target (Join-Path $DocumentsRoot 'freizeitexperten.de\freizeitexperten-erp-dev-git')
 Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/freizeitexperten-plugins-work.git' -Target (Join-Path $DocumentsRoot 'freizeitexperten.de\plugins-work')
 
+$driveRelativePath = 'Meine Ablage\Projekte\KI Projekte'
+$driveProjectRoot = Get-PSDrive -PSProvider FileSystem |
+    ForEach-Object { Join-Path $_.Root $driveRelativePath } |
+    Where-Object { Test-Path -LiteralPath $_ } |
+    Select-Object -First 1
+if ($driveProjectRoot) {
+    Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/fokus-tracker-website.git' -Target (Join-Path $driveProjectRoot 'Fokus Tracker Website')
+} else {
+    Write-Warning 'Google Drive ist noch nicht verfügbar; Fokus Tracker Website wird beim nächsten Setup-Lauf geklont.'
+}
+
 & (Join-Path $PSScriptRoot 'install-auto-sync.ps1') -IntervalMinutes 15
 Write-Host 'Notebook-Einrichtung abgeschlossen.' -ForegroundColor Green

@@ -16,7 +16,11 @@ function Invoke-Git {
 }
 
 foreach ($entry in $config.projects) {
-    $project = [IO.Path]::GetFullPath((Join-Path $workspaceRoot $entry))
+    $project = if ([IO.Path]::IsPathRooted($entry)) {
+        [IO.Path]::GetFullPath($entry)
+    } else {
+        [IO.Path]::GetFullPath((Join-Path $workspaceRoot $entry))
+    }
     Write-Host "`n==> $project"
 
     if (-not (Test-Path -LiteralPath (Join-Path $project '.git'))) {
