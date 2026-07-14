@@ -1,0 +1,10 @@
+{
+  "drive_relative_path": "Meine Ablage\\Projekte\\KI Projekte",
+  "backup_root": "Freizeitexperten\\Codex-Auto-Backup",
+  "sources": [
+    "freizeitexperten.de\\LIVE Website Freizeitexperten",
+    "freizeitexperten.de\\DEV Website Freizeitexperten",
+    "freizeitexperten.de\\tipidorf-walbeck",
+    "freizeitexperten.de\\local-mariadb"
+  ]
+}
