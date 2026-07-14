@@ -8,7 +8,7 @@ if ($IntervalMinutes -lt 5) { throw 'Das Intervall muss mindestens 5 Minuten bet
 
 $scriptPath = Join-Path $PSScriptRoot 'sync-git-projects.ps1'
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
-$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date.AddMinutes(1)
+$trigger = New-ScheduledTaskTrigger -Daily -At '00:00'
 $trigger.Repetition.Interval = "PT$IntervalMinutes`M"
 $trigger.Repetition.Duration = 'P1D'
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -MultipleInstances IgnoreNew
