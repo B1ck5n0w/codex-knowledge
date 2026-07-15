@@ -15,7 +15,7 @@ Diese Anleitung richtet die bestehenden Codex-Projekte auf einem zweiten Windows
 
 ## 2. GitHub und Codex installieren
 
-1. Installiere GitHub Desktop und melde dich mit dem GitHub-Konto **B1ck5n0w** an.
+1. Installiere GitHub Desktop und melde dich mit dem GitHub-Konto **B1ck5n0w** an. Git verwendet anschließend den Git Credential Manager; an einer Git-Passwortabfrage niemals ein GitHub-Passwort eingeben.
 2. Installiere bzw. öffne Codex.
 3. Öffne PowerShell und führe diese beiden Befehle aus:
 
@@ -30,6 +30,14 @@ Das Skript klont diese Projekte und richtet die Synchronisation ein:
 - `freizeitexperten.de\freizeitexperten-erp-dev-git`
 - `freizeitexperten.de\plugins-work`
 - `Fokus Tracker Website` im Google-Drive-Ordner
+
+Falls GitHub beim ersten privaten Repository eine Anmeldung verlangt, melde dich im geöffneten Browserfenster an. Alternativ kann die Anmeldung gezielt gestartet werden:
+
+```powershell
+git credential-manager github login --browser --username B1ck5n0w
+```
+
+Die Anleitung enthält nur den Clone von `codex-knowledge` und den anschließenden Aufruf des Setup-Skripts; es gibt keinen Clone-Befehl mit einer `.ps1`-Zieldatei.
 
 ## 3. Automatische Synchronisation prüfen
 

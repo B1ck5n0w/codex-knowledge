@@ -15,6 +15,21 @@ function Invoke-Git {
     }
 }
 
+function Get-SensitivePaths {
+    param([string]$Project)
+
+    $paths = & git -C $Project diff --cached --name-only
+    if ($LASTEXITCODE -ne 0) { throw 'Vorgemerkte Dateien konnten nicht geprüft werden.' }
+
+    # Protect common secret formats even if a repository's .gitignore is
+    # incomplete. Existing tracked secrets still stop the sync for review.
+    return @($paths | Where-Object {
+        $_ -match '(^|/)\.env($|\.)' -or
+        $_ -match '(?i)(^|/)(id_rsa|credentials)(\.|$)' -or
+        $_ -match '(?i)\.(pem|key|pfx|p12|crt)$'
+    })
+}
+
 foreach ($entry in $config.projects) {
     $project = if ([IO.Path]::IsPathRooted($entry)) {
         [IO.Path]::GetFullPath($entry)
@@ -36,6 +51,12 @@ foreach ($entry in $config.projects) {
 
     try {
         Invoke-Git @('-C', $project, 'add', '-A')
+        $sensitivePaths = Get-SensitivePaths -Project $project
+        if ($sensitivePaths.Count -gt 0) {
+            & git -C $project restore --staged -- $sensitivePaths
+            if ($LASTEXITCODE -ne 0) { throw 'Sensible Dateien konnten nicht aus dem Staging entfernt werden.' }
+            Write-Warning ('Nicht eingecheckt (sensible Dateien): ' + ($sensitivePaths -join ', '))
+        }
         & git -C $project diff --cached --quiet
         if ($LASTEXITCODE -eq 1) {
             Invoke-Git @('-C', $project, 'commit', '-m', "Automatische Sicherung $timestamp")

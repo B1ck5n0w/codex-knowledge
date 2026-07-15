@@ -5,6 +5,13 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+function Initialize-GitHubCredentials {
+    # Git Credential Manager opens the GitHub sign-in flow when no credential
+    # is present. GitHub passwords must never be entered at a Git prompt.
+    & git credential-manager configure
+    if ($LASTEXITCODE -ne 0) { throw 'Git Credential Manager konnte nicht eingerichtet werden.' }
+}
+
 function Get-OrCloneProject {
     param(
         [string]$Repository,
@@ -27,6 +34,8 @@ function Get-OrCloneProject {
     git clone $Repository $Target
     if ($LASTEXITCODE -ne 0) { throw "Klonen fehlgeschlagen: $Repository" }
 }
+
+Initialize-GitHubCredentials
 
 Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/sommer-party.git' -Target (Join-Path $DocumentsRoot 'Sommer Party')
 Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/freizeitexperten-erp-dev.git' -Target (Join-Path $DocumentsRoot 'freizeitexperten.de\freizeitexperten-erp-dev-git')
