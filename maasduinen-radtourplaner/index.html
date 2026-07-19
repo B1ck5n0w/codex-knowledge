@@ -11,9 +11,11 @@
     body { margin:0; font:16px/1.45 system-ui,sans-serif; color:var(--text); background:var(--bg); }
     header { padding:18px 24px; background:var(--panel); border-bottom:1px solid var(--line); }
     h1 { margin:0; font-size:1.3rem; } header p { margin:4px 0 0; color:var(--muted); }
-    main { display:grid; grid-template-columns:360px 1fr; min-height:calc(100vh - 88px); }
-    aside { padding:18px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; }
-    #map { min-height:560px; height:calc(100vh - 88px); }
+    main { display:grid; grid-template-columns:360px minmax(0,1fr); min-height:calc(100vh - 88px); min-width:0; }
+    aside { min-width:0; padding:18px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; }
+    #map { width:100%; min-width:0; min-height:560px; height:calc(100vh - 88px); background:var(--bg); overflow:hidden; }
+    /* Verhindert, dass globale Bildregeln die 256px-OpenStreetMap-Kacheln verkleinern. */
+    #map img.leaflet-tile { width:256px !important; height:256px !important; max-width:none !important; max-height:none !important; }
     fieldset { margin:0 0 16px; padding:12px; border:1px solid var(--line); border-radius:10px; }
     legend { padding:0 6px; font-weight:650; } label { display:block; margin:8px 0; } input,select,button { font:inherit; }
     input[type=text], input[type=password], select { width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--text); }
@@ -21,6 +23,8 @@
     button:disabled { opacity:.5; cursor:not-allowed; } small,.hint,#status { display:block; color:var(--muted); } #status { margin:10px 0; min-height:2.8em; }
     .metric { display:grid; grid-template-columns:1fr auto; gap:4px 12px; margin:8px 0; } .metric strong { text-align:right; }
     .legend { display:flex; gap:12px; flex-wrap:wrap; font-size:.85rem; color:var(--muted); } .legend i { display:inline-block; width:18px; height:4px; border-radius:2px; vertical-align:middle; margin-right:4px; } .out { background:var(--blue); }.back { background:var(--return); }
+    #preview { margin:10px 0 0; } #preview img { display:block; width:100%; max-height:150px; object-fit:cover; border-radius:7px; background:var(--bg); } #preview a { font-size:.8rem; color:var(--muted); }
+    .result-list { max-height:180px; overflow:auto; margin-top:8px; } .result-list label { padding:6px; border-bottom:1px solid var(--line); font-size:.9rem; }
     @media (max-width:760px) { main { grid-template-columns:1fr; } aside { border-right:0; border-bottom:1px solid var(--line); } #map { height:55vh; min-height:420px; } }
     @media (prefers-color-scheme:dark) { :root { --bg:#17211b; --panel:#202c24; --text:#e5eee7; --muted:#b1c0b5; --line:#405047; --accent:#4fa873; } }
   </style>
@@ -32,18 +36,26 @@
       <fieldset>
         <legend>1 · Start und Ziel</legend>
         <label>Startpunkt <input id="startAddress" type="text" value="Pastoratstraße 13, 47608 Geldern" aria-describedby="startHelp"></label>
-        <small id="startHelp">Klicke anschließend auf die Karte, um den Startpunkt präzise zu setzen.</small>
+        <small id="startHelp">Start per Adresse, Kartenklick oder aktueller GPS-Position.</small>
+        <button id="findAddress" class="secondary" type="button">Adresse als Startpunkt suchen</button>
+        <button id="useGps" class="secondary" type="button">Aktuelle GPS-Position verwenden</button>
         <label>Ziel
-          <select id="destination">
-            <option value="reindersmeer">Reindersmeer · See & Aussicht</option>
-            <option value="arcen">Arcen · Maas & Schlossgärten</option>
-            <option value="well">Well · Maasduinen & Dorfkern</option>
-          </select>
+          <select id="destination"></select>
         </label>
         <button id="setStart" class="secondary" type="button">Startpunkt auf Karte setzen</button>
+        <label>Name für freies Ziel <input id="destinationName" type="text" placeholder="z. B. Café am See"></label>
+        <button id="setDestination" class="secondary" type="button">Freies Ziel auf Karte setzen</button>
+        <button id="saveFavorite" class="secondary" type="button">Aktuelles Ziel als Favorit speichern</button>
+        <div id="preview" aria-live="polite"></div>
       </fieldset>
       <fieldset>
-        <legend>2 · Familienfreundlich</legend>
+        <legend>2 · Ziel im Umkreis finden</legend>
+        <label>Suchradius: <output id="radiusValue">25 km</output><input id="radius" type="range" min="5" max="50" step="5" value="25"></label>
+        <button id="findGoals" type="button">Zielvorschläge suchen</button>
+        <div id="goalList" class="result-list" aria-live="polite"></div>
+      </fieldset>
+      <fieldset>
+        <legend>3 · Familienfreundlich</legend>
         <label><input id="avoidBusy" type="checkbox" checked> laute Landstraßen vermeiden</label>
         <label><input id="preferPaved" type="checkbox" checked> asphaltierte Wege und festen Schotter bevorzugen</label>
         <label><input id="includeIce" type="checkbox" checked> Eiscafé vorschlagen</label>
@@ -51,12 +63,12 @@
         <label><input id="includeSights" type="checkbox" checked> Sehenswürdigkeiten / Spielplatz vorschlagen</label>
       </fieldset>
       <fieldset>
-        <legend>3 · Route berechnen</legend>
-        <label>OpenRouteService-Schlüssel (optional)
-          <input id="orsKey" type="password" autocomplete="off" placeholder="für echte Straßenroute einfügen">
-        </label>
-        <small>Ohne Schlüssel zeigt die Karte einen Planungsentwurf. Mit Schlüssel wird die Anfrage erst nach Klick auf „Route berechnen“ an OpenRouteService gesendet.</small>
-        <button id="calculate" type="button">Route berechnen</button>
+        <legend>4 · Optionale Stopps & Rückweg</legend>
+        <button id="findStops" class="secondary" type="button">Stopps entlang der Hinfahrt vorschlagen</button>
+        <div id="stopList" class="result-list" aria-live="polite"></div>
+        <label>Rückfahrt<select id="returnMode"><option value="direct">direkt und schnell</option><option value="alternative" selected>abweichend, ohne großen Umweg</option></select></label>
+        <button id="calculate" type="button">Komplette Tour berechnen</button>
+        <small>Die Route wird erst nach Klick auf „Route berechnen“ an OpenRouteService gesendet. Der Zugangsschlüssel ist nur für diese lokale Version hinterlegt.</small>
         <button id="download" class="secondary" type="button" disabled>GPX herunterladen</button>
       </fieldset>
       <div class="legend"><span><i class="out"></i>Hinweg</span><span><i class="back"></i>Rückweg</span></div>
@@ -65,19 +77,42 @@
     </aside>
     <div id="map" aria-label="Karte zur Tourenplanung"></div>
   </main>
+  <dialog id="goalDialog">
+    <form method="dialog">
+      <h2>Umkreis für Zielvorschläge</h2>
+      <label>Umkreis
+        <select id="dialogRadius"><option value="5">5 km</option><option value="10">10 km</option><option value="15">15 km</option><option value="20">20 km</option><option value="25" selected>25 km</option><option value="30">30 km</option><option value="40">40 km</option><option value="50">50 km</option></select>
+      </label>
+      <button id="confirmGoalPoint" value="confirm" type="submit">Vorschläge suchen</button>
+      <button value="cancel" class="secondary" type="submit">Abbrechen</button>
+    </form>
+  </dialog>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
     const targets = {
-      reindersmeer: { name:'Reindersmeer', lat:51.6534, lng:6.0853 },
-      arcen: { name:'Arcen', lat:51.4762, lng:6.1804 },
-      well: { name:'Well', lat:51.5531, lng:6.0886 }
+      reindersmeer: { name:'Reindersmeer · See & Aussicht', lat:51.6534, lng:6.0853, wiki:'Nationaal Park De Maasduinen' },
+      arcen: { name:'Arcen · Maas & Schlossgärten', lat:51.4762, lng:6.1804, wiki:'Arcen' },
+      well: { name:'Well · Maasduinen & Dorfkern', lat:51.5531, lng:6.0886, wiki:'Well (Limburg)' }
     };
-    const map = L.map('map').setView([51.55, 6.20], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap-Mitwirkende' }).addTo(map);
-    let start = null, startMarker = null, destinationMarker = null, outbound = null, returnRoute = null, routePoints = [];
+    // Der Schlüssel ist bewusst nur für die lokale Datei hinterlegt. Vor öffentlichem Hosting muss er serverseitig liegen.
+    const orsKey = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImE0ZTQ3OWJlYThmZTRiZThhOGYwMmY4NmIyNjRhZDg2IiwiaCI6Im11cm11cjY0In0=';
+    const map = L.map('map', { zoomControl:true, scrollWheelZoom:true, doubleClickZoom:false, touchZoom:true, boxZoom:false }).setView([51.55, 6.20], 11);
+    let tileErrors=0;
+    const tiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap-Mitwirkende' }).addTo(map);
+    tiles.on('tileerror', () => { tileErrors++; if (tileErrors===3) status.textContent='Die Kartenkacheln konnten nicht geladen werden. Bitte Internetverbindung oder Werbe-/Tracking-Blocker prüfen.'; });
+    window.addEventListener('load', () => setTimeout(() => map.invalidateSize(), 100));
+    window.addEventListener('resize', () => map.invalidateSize());
+    let start = null, startMarker = null, destinationMarker = null, outbound = null, returnRoute = null, routePoints = [], customDestination = null, forwardCoords = [], goalMarkers = [], stopMarkers = [], selectedStops = [], goalSearchCenter = null, mapMode = 'goal';
     const status = document.getElementById('status');
     const destination = document.getElementById('destination');
-    function destinationData() { return targets[destination.value]; }
+    const destinationName = document.getElementById('destinationName');
+    function favorites() { try { return JSON.parse(localStorage.getItem('maasduinen-favorites') || '{}'); } catch { return {}; } }
+    function renderDestinations(selected) {
+      const all = {...targets, ...favorites()}; const current = selected || destination.value || 'reindersmeer';
+      destination.innerHTML = Object.entries(all).map(([id, place]) => '<option value="'+id+'">'+place.name+'</option>').join('') + '<option value="custom">Freies Ziel auf der Karte</option>';
+      destination.value = current in all || current === 'custom' ? current : 'reindersmeer';
+    }
+    function destinationData() { const all = {...targets, ...favorites()}; return destination.value === 'custom' ? customDestination : all[destination.value]; }
     function marker(label, point, color) { return L.circleMarker([point.lat, point.lng], { radius:9, color, weight:3, fillColor:'#fff', fillOpacity:1 }).addTo(map).bindPopup(label); }
     function setStart(latlng) {
       start = { lat:latlng.lat, lng:latlng.lng };
@@ -88,11 +123,41 @@
     }
     function updateDestination() {
       const end = destinationData();
+      if (!end) { if (destinationMarker) map.removeLayer(destinationMarker); return; }
       if (destinationMarker) map.removeLayer(destinationMarker);
       destinationMarker = marker(end.name, end, '#246b45');
       if (start) map.fitBounds(L.latLngBounds([[start.lat,start.lng],[end.lat,end.lng]]).pad(.20));
+      loadPreview(end);
+    }
+    async function loadPreview(place) {
+      const preview = document.getElementById('preview');
+      if (!place || !place.wiki) { preview.innerHTML = '<small>Für frei gewählte Ziele wird kein Bild automatisch geladen.</small>'; return; }
+      preview.innerHTML = '<small>Bild wird von Wikipedia geladen …</small>';
+      try {
+        const response = await fetch('https://nl.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(place.wiki));
+        const data = await response.json();
+        if (!data.thumbnail) throw new Error('Kein Vorschaubild');
+        preview.innerHTML = '<img src="'+data.thumbnail.source+'" alt="Vorschaubild zu '+place.name+'"><a href="'+data.content_urls.desktop.page+'" target="_blank" rel="noopener">Bild und Informationen: Wikipedia</a>';
+      } catch { preview.innerHTML = '<small>Für dieses Ziel ist derzeit kein freies Vorschaubild verfügbar.</small>'; }
     }
     function clearRoute() { [outbound, returnRoute].forEach(layer => { if (layer) map.removeLayer(layer); }); outbound = returnRoute = null; routePoints = []; document.getElementById('download').disabled = true; }
+    function clearMarkers(items) { items.splice(0).forEach(m => map.removeLayer(m)); }
+    function pointOf(element) { const c = element.center || element; return c ? {lat:c.lat, lng:c.lon} : null; }
+    async function overpass(query) { const response = await fetch('https://overpass-api.de/api/interpreter', {method:'POST', body:query}); if (!response.ok) throw new Error('OpenStreetMap-Suche nicht verfügbar'); return (await response.json()).elements; }
+    function nameOf(e) { const t=e.tags||{}; return t.name || t['name:de'] || (t.tourism==='viewpoint'?'Aussichtspunkt':t.leisure==='playground'?'Spielplatz':t.amenity==='biergarten'?'Biergarten':t.amenity==='restaurant'?'Restaurant':'Sehenswürdigkeit'); }
+    async function findGoals() {
+      if (!start && !goalSearchCenter) { status.textContent='Bitte zuerst einen Startpunkt setzen.'; return; }
+      status.textContent='Zielvorschläge werden aus OpenStreetMap gesucht …'; clearMarkers(goalMarkers); const radius=Number(document.getElementById('radius').value)*1000;
+      const center=goalSearchCenter || start; const q='[out:json][timeout:25];(nwr["tourism"="attraction"](around:'+radius+','+center.lat+','+center.lng+');nwr["tourism"="viewpoint"](around:'+radius+','+center.lat+','+center.lng+');nwr["natural"="water"](around:'+radius+','+center.lat+','+center.lng+');nwr["leisure"="playground"](around:'+radius+','+center.lat+','+center.lng+');nwr["amenity"~"restaurant|biergarten"](around:'+radius+','+center.lat+','+center.lng+'););out center 60;';
+      try { const rows=(await overpass(q)).map(e=>({...pointOf(e),name:nameOf(e),tags:e.tags||{}})).filter(p=>p.lat&&p.lng).slice(0,30); const list=document.getElementById('goalList'); list.innerHTML=rows.map((p,i)=>'<label><input type="radio" name="goal" value="'+i+'"> '+p.name+'</label>').join('') || '<small>Keine passenden Ziele gefunden.</small>'; rows.forEach((p,i)=>goalMarkers.push(marker(p.name,p,'#246b45').on('click',()=>selectGoal(p)))); list.querySelectorAll('input').forEach((input,i)=>input.addEventListener('change',()=>selectGoal(rows[i]))); status.textContent=rows.length+' Zielvorschläge gefunden.'; } catch(e) { status.textContent=e.message; }
+    }
+    function selectGoal(p) { customDestination={name:p.name,lat:p.lat,lng:p.lng}; destination.value='custom'; destinationName.value=p.name; updateDestination(); clearRoute(); status.textContent='Ziel ausgewählt: '+p.name+'. Jetzt Stopps entlang der Hinfahrt suchen.'; }
+    async function findStops() {
+      if (!start || !destinationData()) { status.textContent='Bitte zuerst Start und Ziel auswählen.'; return; }
+      if (!forwardCoords.length) { await calculate(); if (!forwardCoords.length) return; }
+      status.textContent='Optionale Stopps entlang der Hinfahrt werden gesucht …'; clearMarkers(stopMarkers); const sample=forwardCoords.filter((_,i)=>i%Math.max(1,Math.floor(forwardCoords.length/10))===0).slice(0,12); const clauses=sample.map(p=>`nwr["amenity"~"cafe|restaurant|biergarten"](around:700,${p.lat},${p.lng});nwr["leisure"="playground"](around:700,${p.lat},${p.lng});nwr["tourism"="viewpoint"](around:700,${p.lat},${p.lng});`).join('');
+      try { const seen=new Set(), rows=(await overpass('[out:json][timeout:30];('+clauses+');out center 80;')).map(e=>({...pointOf(e),name:nameOf(e)})).filter(p=>p.lat&&p.lng&&!seen.has(p.lat.toFixed(4)+p.lng.toFixed(4))&&seen.add(p.lat.toFixed(4)+p.lng.toFixed(4))).slice(0,25); const list=document.getElementById('stopList'); list.innerHTML=rows.map((p,i)=>'<label><input type="checkbox" value="'+i+'"> '+p.name+'</label>').join('') || '<small>Keine optionalen Stopps gefunden.</small>'; rows.forEach(p=>stopMarkers.push(marker(p.name,p,'#d36b21'))); list.querySelectorAll('input').forEach((input,i)=>input.addEventListener('change',()=>{ selectedStops=Array.from(list.querySelectorAll('input:checked')).map(x=>rows[Number(x.value)]); })); status.textContent=rows.length+' optionale Stopps gefunden. Markiere gewünschte und berechne dann die komplette Tour.'; } catch(e) { status.textContent=e.message; }
+    }
     function showDraft() {
       const end = destinationData(); const pivot = { lat:(start.lat + end.lat)/2 + .022, lng:(start.lng + end.lng)/2 - .014 };
       const backPivot = { lat:(start.lat + end.lat)/2 - .018, lng:(start.lng + end.lng)/2 + .025 };
@@ -103,24 +168,26 @@
       document.getElementById('distance').textContent = 'ca. ' + km + ' km (Entwurf)';
       document.getElementById('duration').textContent = 'ca. ' + Math.round(km / 14 * 10) / 10 + ' Std.';
       document.getElementById('download').disabled = false;
-      status.textContent = 'Planungsentwurf angezeigt. Für eine echte, straßengenaue Route bitte einen eigenen OpenRouteService-Schlüssel eintragen.';
+      status.textContent = 'Planungsentwurf angezeigt. Der Routendienst war gerade nicht erreichbar; bitte später erneut versuchen.';
     }
     async function calculate() {
       if (!start) { status.textContent = 'Bitte zuerst den Startpunkt auf der Karte setzen.'; return; }
-      clearRoute(); const end = destinationData(); const key = document.getElementById('orsKey').value.trim();
-      if (!key) { showDraft(); return; }
+      clearRoute(); const end = destinationData(); const key = orsKey;
+      if (!end) { status.textContent = 'Bitte zuerst ein Ziel wählen oder auf der Karte setzen.'; return; }
       status.textContent = 'Route wird berechnet …';
       try {
         const profile = 'cycling-regular';
         const options = { avoid_features: document.getElementById('avoidBusy').checked ? ['highways','ferries'] : [] };
         const routeRequest = coordinates => fetch('https://api.openrouteservice.org/v2/directions/' + profile + '/geojson', { method:'POST', headers:{'Authorization':key,'Content-Type':'application/json'}, body:JSON.stringify({ coordinates, preference: document.getElementById('avoidBusy').checked ? 'recommended' : 'fastest', options }) });
+        const outPoints = [[start.lng,start.lat], ...selectedStops.map(p=>[p.lng,p.lat]), [end.lng,end.lat]];
         const via = [(start.lng + end.lng) / 2 + .020, (start.lat + end.lat) / 2 - .018];
-        const [outRes, backRes] = await Promise.all([routeRequest([[start.lng,start.lat],[end.lng,end.lat]]), routeRequest([[end.lng,end.lat],via,[start.lng,start.lat]])]);
+        const backPoints = document.getElementById('returnMode').value === 'direct' ? [[end.lng,end.lat],[start.lng,start.lat]] : [[end.lng,end.lat],via,[start.lng,start.lat]];
+        const [outRes, backRes] = await Promise.all([routeRequest(outPoints), routeRequest(backPoints)]);
         if (!outRes.ok || !backRes.ok) throw new Error('Routendienst antwortet mit ' + (!outRes.ok ? outRes.status : backRes.status));
         const [outData, backData] = await Promise.all([outRes.json(),backRes.json()]);
         const outCoords = outData.features[0].geometry.coordinates.map(p => ({lat:p[1],lng:p[0]})); const backCoords = backData.features[0].geometry.coordinates.map(p => ({lat:p[1],lng:p[0]}));
         const outSummary = outData.features[0].properties.summary, backSummary = backData.features[0].properties.summary;
-        routePoints = outCoords.concat(backCoords.slice(1)); outbound = L.geoJSON(outData, { style:{ color:'#1769aa', weight:5 } }).addTo(map);
+        forwardCoords = outCoords; routePoints = outCoords.concat(backCoords.slice(1)); outbound = L.geoJSON(outData, { style:{ color:'#1769aa', weight:5 } }).addTo(map);
         returnRoute = L.geoJSON(backData, { style:{ color:'#d36b21', weight:4, dashArray:'8 8', opacity:.8 } }).addTo(map);
         map.fitBounds(L.featureGroup([outbound,returnRoute]).getBounds().pad(.15)); const totalKm = (outSummary.distance + backSummary.distance) / 1000; const totalMinutes = (outSummary.duration + backSummary.duration) / 60;
         document.getElementById('distance').textContent = totalKm.toFixed(1) + ' km gesamt'; document.getElementById('duration').textContent = Math.round(totalMinutes) + ' Min. ohne Pausen'; document.getElementById('download').disabled = false;
@@ -133,9 +200,16 @@
       const gpx = '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Familien-Radtourenplaner" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>Geldern – '+name+'</name><trkseg>'+points+'</trkseg></trk></gpx>';
       const link = document.createElement('a'); link.href=URL.createObjectURL(new Blob([gpx],{type:'application/gpx+xml'})); link.download='geldern-'+destination.value+'.gpx'; link.click(); URL.revokeObjectURL(link.href);
     }
-    document.getElementById('setStart').addEventListener('click', () => { status.textContent = 'Klicke jetzt auf die Karte – dort wird der Startpunkt gesetzt.'; map.once('click', e => setStart(e.latlng)); });
-    destination.addEventListener('change', () => { updateDestination(); clearRoute(); }); document.getElementById('calculate').addEventListener('click', calculate); document.getElementById('download').addEventListener('click', downloadGpx);
-    updateDestination();
+    document.getElementById('setStart').addEventListener('click', () => { mapMode='start'; status.textContent = 'Klicke jetzt auf die Karte – dort wird der Startpunkt gesetzt.'; });
+    document.getElementById('useGps').addEventListener('click', () => { if (!navigator.geolocation) { status.textContent='GPS wird von diesem Browser nicht unterstützt.'; return; } status.textContent='Bitte GPS-Freigabe bestätigen …'; navigator.geolocation.getCurrentPosition(p=>setStart({lat:p.coords.latitude,lng:p.coords.longitude}),()=>status.textContent='GPS-Position konnte nicht gelesen werden.',{enableHighAccuracy:true,timeout:15000}); });
+    document.getElementById('findAddress').addEventListener('click', async () => { const q=document.getElementById('startAddress').value.trim(); if (!q) return; status.textContent='Adresse wird gesucht …'; try { const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q='+encodeURIComponent(q)); const d=await r.json(); if (!d[0]) throw new Error('Adresse nicht gefunden.'); setStart({lat:Number(d[0].lat),lng:Number(d[0].lon)}); } catch(e) { status.textContent=e.message; } });
+    document.getElementById('setDestination').addEventListener('click', () => { mapMode='goal'; status.textContent = 'Klicke jetzt auf die Karte – dort wird das freie Ziel gesetzt.'; });
+    document.getElementById('saveFavorite').addEventListener('click', () => { const place = destinationData(); if (!place) { status.textContent='Bitte zuerst ein Ziel wählen.'; return; } const id = 'favorite-' + Date.now(); const saved=favorites(); saved[id] = {...place, name:(destinationName.value.trim() || place.name), wiki:place.wiki || ''}; localStorage.setItem('maasduinen-favorites', JSON.stringify(saved)); renderDestinations(id); status.textContent='Favorit wurde nur auf diesem Gerät gespeichert.'; });
+    destination.addEventListener('change', () => { updateDestination(); clearRoute(); }); document.getElementById('radius').addEventListener('input',e=>document.getElementById('radiusValue').textContent=e.target.value+' km'); document.getElementById('findGoals').addEventListener('click',findGoals); document.getElementById('findStops').addEventListener('click',findStops); document.getElementById('calculate').addEventListener('click', calculate); document.getElementById('download').addEventListener('click', downloadGpx);
+    const goalDialog=document.getElementById('goalDialog'); let pendingGoal=null;
+    map.on('click', e => { if (mapMode==='start') { setStart(e.latlng); mapMode='goal'; return; } pendingGoal=e.latlng; goalDialog.showModal(); });
+    document.getElementById('confirmGoalPoint').addEventListener('click', () => { goalSearchCenter={lat:pendingGoal.lat,lng:pendingGoal.lng}; customDestination={name:'Markierter Bereich',lat:pendingGoal.lat,lng:pendingGoal.lng}; destination.value='custom'; updateDestination(); const km=document.getElementById('dialogRadius').value; document.getElementById('radius').value=km; document.getElementById('radiusValue').textContent=km+' km'; setTimeout(findGoals,0); });
+    renderDestinations(); updateDestination();
   </script>
 </body>
 </html>
