@@ -11,11 +11,14 @@
     body { margin:0; font:16px/1.45 system-ui,sans-serif; color:var(--text); background:var(--bg); }
     header { padding:18px 24px; background:var(--panel); border-bottom:1px solid var(--line); }
     h1 { margin:0; font-size:1.3rem; } header p { margin:4px 0 0; color:var(--muted); }
-    main { display:grid; grid-template-columns:360px minmax(0,1fr); min-height:calc(100vh - 88px); min-width:0; }
+    main { display:grid; grid-template-columns:360px minmax(0,1fr); height:calc(100vh - 88px); min-width:0; overflow:hidden; }
     aside { min-width:0; padding:18px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; }
     #map { width:100%; min-width:0; min-height:560px; height:calc(100vh - 88px); background:var(--bg); overflow:hidden; }
-    /* Verhindert, dass globale Bildregeln die 256px-OpenStreetMap-Kacheln verkleinern. */
-    #map img.leaflet-tile { width:256px !important; height:256px !important; max-width:none !important; max-height:none !important; }
+    /* Leaflet-Kacheln vom globalen Seiten-CSS isolieren: ohne diese Regeln können
+       allgemeine Bildregeln zu Zwischenräumen zwischen Kartenkacheln führen. */
+    #map .leaflet-pane, #map .leaflet-tile-container { position:absolute !important; left:0 !important; top:0 !important; }
+    #map img.leaflet-tile { position:absolute !important; left:0 !important; top:0 !important; width:256px !important; height:256px !important; min-width:256px !important; min-height:256px !important; max-width:none !important; max-height:none !important; margin:0 !important; padding:0 !important; border:0 !important; box-sizing:content-box !important; object-fit:fill !important; }
+    .tour-pin-wrap { background:transparent; border:0; } .tour-pin { display:block; width:22px; height:22px; border:3px solid #fff; border-radius:50% 50% 50% 0; background:var(--pin); box-shadow:0 2px 5px rgba(0,0,0,.45); transform:rotate(-45deg); } .tour-pin-label { display:block; margin:5px 0 0 -24px; min-width:70px; padding:2px 5px; border-radius:4px; background:var(--panel); color:var(--text); font-size:11px; font-weight:650; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,.35); }
     fieldset { margin:0 0 16px; padding:12px; border:1px solid var(--line); border-radius:10px; }
     legend { padding:0 6px; font-weight:650; } label { display:block; margin:8px 0; } input,select,button { font:inherit; }
     input[type=text], input[type=password], select { width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--text); }
@@ -102,7 +105,7 @@
     tiles.on('tileerror', () => { tileErrors++; if (tileErrors===3) status.textContent='Die Kartenkacheln konnten nicht geladen werden. Bitte Internetverbindung oder Werbe-/Tracking-Blocker prüfen.'; });
     window.addEventListener('load', () => setTimeout(() => map.invalidateSize(), 100));
     window.addEventListener('resize', () => map.invalidateSize());
-    let start = null, startMarker = null, destinationMarker = null, outbound = null, returnRoute = null, routePoints = [], customDestination = null, forwardCoords = [], goalMarkers = [], stopMarkers = [], selectedStops = [], goalSearchCenter = null, mapMode = 'goal';
+    let start = null, startMarker = null, destinationMarker = null, goalArea = null, outbound = null, returnRoute = null, routePoints = [], customDestination = null, forwardCoords = [], goalMarkers = [], stopMarkers = [], selectedStops = [], goalSearchCenter = null, mapMode = 'goal';
     const status = document.getElementById('status');
     const destination = document.getElementById('destination');
     const destinationName = document.getElementById('destinationName');
@@ -113,11 +116,12 @@
       destination.value = current in all || current === 'custom' ? current : 'reindersmeer';
     }
     function destinationData() { const all = {...targets, ...favorites()}; return destination.value === 'custom' ? customDestination : all[destination.value]; }
-    function marker(label, point, color) { return L.circleMarker([point.lat, point.lng], { radius:9, color, weight:3, fillColor:'#fff', fillOpacity:1 }).addTo(map).bindPopup(label); }
+    function safe(text) { const el=document.createElement('span'); el.textContent=String(text); return el.innerHTML; }
+    function marker(label, point, color, kind='Ziel') { const icon=L.divIcon({className:'tour-pin-wrap',html:'<span class="tour-pin" style="--pin:'+color+'"></span><span class="tour-pin-label">'+safe(kind)+'</span>',iconSize:[72,54],iconAnchor:[11,22]}); return L.marker([point.lat,point.lng],{icon,keyboard:true,title:String(label),zIndexOffset:1000}).addTo(map).bindPopup('<strong>'+safe(label)+'</strong>'); }
     function setStart(latlng) {
       start = { lat:latlng.lat, lng:latlng.lng };
       if (startMarker) map.removeLayer(startMarker);
-      startMarker = marker('Start', start, '#1769aa');
+      startMarker = marker('Startpunkt', start, '#1769aa', 'Start');
       updateDestination();
       status.textContent = 'Startpunkt gesetzt. Du kannst nun die Route berechnen.';
     }
@@ -125,7 +129,7 @@
       const end = destinationData();
       if (!end) { if (destinationMarker) map.removeLayer(destinationMarker); return; }
       if (destinationMarker) map.removeLayer(destinationMarker);
-      destinationMarker = marker(end.name, end, '#246b45');
+      destinationMarker = marker(end.name, end, '#246b45', 'Ziel');
       if (start) map.fitBounds(L.latLngBounds([[start.lat,start.lng],[end.lat,end.lng]]).pad(.20));
       loadPreview(end);
     }
@@ -143,25 +147,30 @@
     function clearRoute() { [outbound, returnRoute].forEach(layer => { if (layer) map.removeLayer(layer); }); outbound = returnRoute = null; routePoints = []; document.getElementById('download').disabled = true; }
     function clearMarkers(items) { items.splice(0).forEach(m => map.removeLayer(m)); }
     function pointOf(element) { const c = element.center || element; return c ? {lat:c.lat, lng:c.lon} : null; }
-    async function overpass(query) { const response = await fetch('https://overpass-api.de/api/interpreter', {method:'POST', body:query}); if (!response.ok) throw new Error('OpenStreetMap-Suche nicht verfügbar'); return (await response.json()).elements; }
+    async function overpass(query) {
+      let lastError; for (const base of ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']) {
+        try { const response=await fetch(base+'?data='+encodeURIComponent(query)); if (!response.ok) throw new Error(response.status); return (await response.json()).elements; } catch (error) { lastError=error; }
+      } throw new Error('OpenStreetMap-Suche derzeit nicht erreichbar: '+lastError.message);
+    }
     function nameOf(e) { const t=e.tags||{}; return t.name || t['name:de'] || (t.tourism==='viewpoint'?'Aussichtspunkt':t.leisure==='playground'?'Spielplatz':t.amenity==='biergarten'?'Biergarten':t.amenity==='restaurant'?'Restaurant':'Sehenswürdigkeit'); }
     async function findGoals() {
       if (!start && !goalSearchCenter) { status.textContent='Bitte zuerst einen Startpunkt setzen.'; return; }
       status.textContent='Zielvorschläge werden aus OpenStreetMap gesucht …'; clearMarkers(goalMarkers); const radius=Number(document.getElementById('radius').value)*1000;
       const center=goalSearchCenter || start; const q='[out:json][timeout:25];(nwr["tourism"="attraction"](around:'+radius+','+center.lat+','+center.lng+');nwr["tourism"="viewpoint"](around:'+radius+','+center.lat+','+center.lng+');nwr["natural"="water"](around:'+radius+','+center.lat+','+center.lng+');nwr["leisure"="playground"](around:'+radius+','+center.lat+','+center.lng+');nwr["amenity"~"restaurant|biergarten"](around:'+radius+','+center.lat+','+center.lng+'););out center 60;';
-      try { const rows=(await overpass(q)).map(e=>({...pointOf(e),name:nameOf(e),tags:e.tags||{}})).filter(p=>p.lat&&p.lng).slice(0,30); const list=document.getElementById('goalList'); list.innerHTML=rows.map((p,i)=>'<label><input type="radio" name="goal" value="'+i+'"> '+p.name+'</label>').join('') || '<small>Keine passenden Ziele gefunden.</small>'; rows.forEach((p,i)=>goalMarkers.push(marker(p.name,p,'#246b45').on('click',()=>selectGoal(p)))); list.querySelectorAll('input').forEach((input,i)=>input.addEventListener('change',()=>selectGoal(rows[i]))); status.textContent=rows.length+' Zielvorschläge gefunden.'; } catch(e) { status.textContent=e.message; }
+      try { const rows=(await overpass(q)).map(e=>({...pointOf(e),name:nameOf(e),tags:e.tags||{}})).filter(p=>p.lat&&p.lng).slice(0,30); const list=document.getElementById('goalList'); list.innerHTML=rows.map((p,i)=>'<label><input type="radio" name="goal" value="'+i+'"> '+safe(p.name)+'</label>').join('') || '<small>Keine passenden Ziele gefunden.</small>'; rows.forEach((p,i)=>goalMarkers.push(marker(p.name,p,'#246b45','Vorschlag').on('click',()=>selectGoal(p)))); list.querySelectorAll('input').forEach((input,i)=>input.addEventListener('change',()=>selectGoal(rows[i]))); status.textContent=rows.length+' Zielvorschläge gefunden.'; } catch(e) { status.textContent=e.message; }
     }
     function selectGoal(p) { customDestination={name:p.name,lat:p.lat,lng:p.lng}; destination.value='custom'; destinationName.value=p.name; updateDestination(); clearRoute(); status.textContent='Ziel ausgewählt: '+p.name+'. Jetzt Stopps entlang der Hinfahrt suchen.'; }
     async function findStops() {
       if (!start || !destinationData()) { status.textContent='Bitte zuerst Start und Ziel auswählen.'; return; }
       if (!forwardCoords.length) { await calculate(); if (!forwardCoords.length) return; }
       status.textContent='Optionale Stopps entlang der Hinfahrt werden gesucht …'; clearMarkers(stopMarkers); const sample=forwardCoords.filter((_,i)=>i%Math.max(1,Math.floor(forwardCoords.length/10))===0).slice(0,12); const clauses=sample.map(p=>`nwr["amenity"~"cafe|restaurant|biergarten"](around:700,${p.lat},${p.lng});nwr["leisure"="playground"](around:700,${p.lat},${p.lng});nwr["tourism"="viewpoint"](around:700,${p.lat},${p.lng});`).join('');
-      try { const seen=new Set(), rows=(await overpass('[out:json][timeout:30];('+clauses+');out center 80;')).map(e=>({...pointOf(e),name:nameOf(e)})).filter(p=>p.lat&&p.lng&&!seen.has(p.lat.toFixed(4)+p.lng.toFixed(4))&&seen.add(p.lat.toFixed(4)+p.lng.toFixed(4))).slice(0,25); const list=document.getElementById('stopList'); list.innerHTML=rows.map((p,i)=>'<label><input type="checkbox" value="'+i+'"> '+p.name+'</label>').join('') || '<small>Keine optionalen Stopps gefunden.</small>'; rows.forEach(p=>stopMarkers.push(marker(p.name,p,'#d36b21'))); list.querySelectorAll('input').forEach((input,i)=>input.addEventListener('change',()=>{ selectedStops=Array.from(list.querySelectorAll('input:checked')).map(x=>rows[Number(x.value)]); })); status.textContent=rows.length+' optionale Stopps gefunden. Markiere gewünschte und berechne dann die komplette Tour.'; } catch(e) { status.textContent=e.message; }
+      try { const seen=new Set(), rows=(await overpass('[out:json][timeout:30];('+clauses+');out center 80;')).map(e=>({...pointOf(e),name:nameOf(e)})).filter(p=>p.lat&&p.lng&&!seen.has(p.lat.toFixed(4)+p.lng.toFixed(4))&&seen.add(p.lat.toFixed(4)+p.lng.toFixed(4))).slice(0,25); const list=document.getElementById('stopList'); list.innerHTML=rows.map((p,i)=>'<label><input type="checkbox" value="'+i+'"> '+safe(p.name)+'</label>').join('') || '<small>Keine optionalen Stopps gefunden.</small>'; const inputs=[...list.querySelectorAll('input')]; rows.forEach((p,i)=>{ const pin=marker(p.name,p,'#d36b21','Stopp'); pin.bindTooltip('✓ auswählen: '+safe(p.name),{direction:'top'}); pin.on('click',()=>{ inputs[i].checked=!inputs[i].checked; inputs[i].dispatchEvent(new Event('change')); }); stopMarkers.push(pin); }); inputs.forEach(input=>input.addEventListener('change',()=>{ selectedStops=inputs.filter(x=>x.checked).map(x=>rows[Number(x.value)]); status.textContent=selectedStops.length+' Stopp(s) gewählt – Hinfahrt wird neu berechnet …'; calculate(); })); status.textContent=rows.length+' optionale Stopps gefunden. Klicke den Marker oder das Kästchen; die Route aktualisiert sich sofort.'; } catch(e) { status.textContent=e.message; }
     }
     function showDraft() {
       const end = destinationData(); const pivot = { lat:(start.lat + end.lat)/2 + .022, lng:(start.lng + end.lng)/2 - .014 };
       const backPivot = { lat:(start.lat + end.lat)/2 - .018, lng:(start.lng + end.lng)/2 + .025 };
       routePoints = [start, pivot, end, backPivot, start];
+      forwardCoords = [start, pivot, end];
       outbound = L.polyline([start,pivot,end], { color:'#1769aa', weight:5, opacity:.85 }).addTo(map);
       returnRoute = L.polyline([end,backPivot,start], { color:'#d36b21', weight:5, opacity:.85, dashArray:'8 8' }).addTo(map);
       const km = Math.round(map.distance(start,end) * 2.15 / 1000);
@@ -208,7 +217,9 @@
     destination.addEventListener('change', () => { updateDestination(); clearRoute(); }); document.getElementById('radius').addEventListener('input',e=>document.getElementById('radiusValue').textContent=e.target.value+' km'); document.getElementById('findGoals').addEventListener('click',findGoals); document.getElementById('findStops').addEventListener('click',findStops); document.getElementById('calculate').addEventListener('click', calculate); document.getElementById('download').addEventListener('click', downloadGpx);
     const goalDialog=document.getElementById('goalDialog'); let pendingGoal=null;
     map.on('click', e => { if (mapMode==='start') { setStart(e.latlng); mapMode='goal'; return; } pendingGoal=e.latlng; goalDialog.showModal(); });
-    document.getElementById('confirmGoalPoint').addEventListener('click', () => { goalSearchCenter={lat:pendingGoal.lat,lng:pendingGoal.lng}; customDestination={name:'Markierter Bereich',lat:pendingGoal.lat,lng:pendingGoal.lng}; destination.value='custom'; updateDestination(); const km=document.getElementById('dialogRadius').value; document.getElementById('radius').value=km; document.getElementById('radiusValue').textContent=km+' km'; setTimeout(findGoals,0); });
+    document.getElementById('confirmGoalPoint').addEventListener('click', () => { goalSearchCenter={lat:pendingGoal.lat,lng:pendingGoal.lng}; customDestination={name:'Markierter Bereich',lat:pendingGoal.lat,lng:pendingGoal.lng}; destination.value='custom'; updateDestination(); const km=Number(document.getElementById('dialogRadius').value); document.getElementById('radius').value=km; document.getElementById('radiusValue').textContent=km+' km'; if (goalArea) map.removeLayer(goalArea); goalArea=L.circle([pendingGoal.lat,pendingGoal.lng],{radius:km*1000,color:'#246b45',weight:2,fillOpacity:.08}).addTo(map); status.textContent='Zielbereich markiert. Vorschläge werden gesucht …'; setTimeout(findGoals,0); });
+    new ResizeObserver(() => map.invalidateSize({pan:false})).observe(document.getElementById('map'));
+    setTimeout(() => map.invalidateSize({pan:false}), 400);
     renderDestinations(); updateDestination();
   </script>
 </body>
