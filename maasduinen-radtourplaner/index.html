@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Familien-Radtourenplaner</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQd6DgB0GfHc0p1uLlM+3uWkBZeJzk=" crossorigin="">
+  <style>
+    :root { color-scheme: light dark; --bg:#f4f7f2; --panel:#fff; --text:#193126; --muted:#627167; --line:#cbd6ce; --accent:#246b45; --blue:#1769aa; --return:#d36b21; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.45 system-ui,sans-serif; color:var(--text); background:var(--bg); }
+    header { padding:18px 24px; background:var(--panel); border-bottom:1px solid var(--line); }
+    h1 { margin:0; font-size:1.3rem; } header p { margin:4px 0 0; color:var(--muted); }
+    main { display:grid; grid-template-columns:360px 1fr; min-height:calc(100vh - 88px); }
+    aside { padding:18px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; }
+    #map { min-height:560px; height:calc(100vh - 88px); }
+    fieldset { margin:0 0 16px; padding:12px; border:1px solid var(--line); border-radius:10px; }
+    legend { padding:0 6px; font-weight:650; } label { display:block; margin:8px 0; } input,select,button { font:inherit; }
+    input[type=text], input[type=password], select { width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--text); }
+    input[type=checkbox] { margin-right:7px; } button { width:100%; margin-top:8px; padding:9px 10px; border:0; border-radius:6px; color:#fff; background:var(--accent); cursor:pointer; } button.secondary { color:var(--text); background:transparent; border:1px solid var(--line); }
+    button:disabled { opacity:.5; cursor:not-allowed; } small,.hint,#status { display:block; color:var(--muted); } #status { margin:10px 0; min-height:2.8em; }
+    .metric { display:grid; grid-template-columns:1fr auto; gap:4px 12px; margin:8px 0; } .metric strong { text-align:right; }
+    .legend { display:flex; gap:12px; flex-wrap:wrap; font-size:.85rem; color:var(--muted); } .legend i { display:inline-block; width:18px; height:4px; border-radius:2px; vertical-align:middle; margin-right:4px; } .out { background:var(--blue); }.back { background:var(--return); }
+    @media (max-width:760px) { main { grid-template-columns:1fr; } aside { border-right:0; border-bottom:1px solid var(--line); } #map { height:55vh; min-height:420px; } }
+    @media (prefers-color-scheme:dark) { :root { --bg:#17211b; --panel:#202c24; --text:#e5eee7; --muted:#b1c0b5; --line:#405047; --accent:#4fa873; } }
+  </style>
+</head>
+<body>
+  <header><h1>Familien-Radtourenplaner · Geldern → Maasduinen</h1><p>Ruhige, kinderfreundliche Rundtouren mit abweichendem Rückweg.</p></header>
+  <main>
+    <aside>
+      <fieldset>
+        <legend>1 · Start und Ziel</legend>
+        <label>Startpunkt <input id="startAddress" type="text" value="Pastoratstraße 13, 47608 Geldern" aria-describedby="startHelp"></label>
+        <small id="startHelp">Klicke anschließend auf die Karte, um den Startpunkt präzise zu setzen.</small>
+        <label>Ziel
+          <select id="destination">
+            <option value="reindersmeer">Reindersmeer · See & Aussicht</option>
+            <option value="arcen">Arcen · Maas & Schlossgärten</option>
+            <option value="well">Well · Maasduinen & Dorfkern</option>
+          </select>
+        </label>
+        <button id="setStart" class="secondary" type="button">Startpunkt auf Karte setzen</button>
+      </fieldset>
+      <fieldset>
+        <legend>2 · Familienfreundlich</legend>
+        <label><input id="avoidBusy" type="checkbox" checked> laute Landstraßen vermeiden</label>
+        <label><input id="preferPaved" type="checkbox" checked> asphaltierte Wege und festen Schotter bevorzugen</label>
+        <label><input id="includeIce" type="checkbox" checked> Eiscafé vorschlagen</label>
+        <label><input id="includeBeer" type="checkbox" checked> Biergarten vorschlagen</label>
+        <label><input id="includeSights" type="checkbox" checked> Sehenswürdigkeiten / Spielplatz vorschlagen</label>
+      </fieldset>
+      <fieldset>
+        <legend>3 · Route berechnen</legend>
+        <label>OpenRouteService-Schlüssel (optional)
+          <input id="orsKey" type="password" autocomplete="off" placeholder="für echte Straßenroute einfügen">
+        </label>
+        <small>Ohne Schlüssel zeigt die Karte einen Planungsentwurf. Mit Schlüssel wird die Anfrage erst nach Klick auf „Route berechnen“ an OpenRouteService gesendet.</small>
+        <button id="calculate" type="button">Route berechnen</button>
+        <button id="download" class="secondary" type="button" disabled>GPX herunterladen</button>
+      </fieldset>
+      <div class="legend"><span><i class="out"></i>Hinweg</span><span><i class="back"></i>Rückweg</span></div>
+      <div id="status" role="status">Wähle auf der Karte einen Startpunkt. Die angezeigte Karte verwendet OpenStreetMap.</div>
+      <div class="metric"><span>Gesamtdistanz</span><strong id="distance">—</strong><span>Fahrzeit (ohne Pausen)</span><strong id="duration">—</strong></div>
+    </aside>
+    <div id="map" aria-label="Karte zur Tourenplanung"></div>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    const targets = {
+      reindersmeer: { name:'Reindersmeer', lat:51.6534, lng:6.0853 },
+      arcen: { name:'Arcen', lat:51.4762, lng:6.1804 },
+      well: { name:'Well', lat:51.5531, lng:6.0886 }
+    };
+    const map = L.map('map').setView([51.55, 6.20], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap-Mitwirkende' }).addTo(map);
+    let start = null, startMarker = null, destinationMarker = null, outbound = null, returnRoute = null, routePoints = [];
+    const status = document.getElementById('status');
+    const destination = document.getElementById('destination');
+    function destinationData() { return targets[destination.value]; }
+    function marker(label, point, color) { return L.circleMarker([point.lat, point.lng], { radius:9, color, weight:3, fillColor:'#fff', fillOpacity:1 }).addTo(map).bindPopup(label); }
+    function setStart(latlng) {
+      start = { lat:latlng.lat, lng:latlng.lng };
+      if (startMarker) map.removeLayer(startMarker);
+      startMarker = marker('Start', start, '#1769aa');
+      updateDestination();
+      status.textContent = 'Startpunkt gesetzt. Du kannst nun die Route berechnen.';
+    }
+    function updateDestination() {
+      const end = destinationData();
+      if (destinationMarker) map.removeLayer(destinationMarker);
+      destinationMarker = marker(end.name, end, '#246b45');
+      if (start) map.fitBounds(L.latLngBounds([[start.lat,start.lng],[end.lat,end.lng]]).pad(.20));
+    }
+    function clearRoute() { [outbound, returnRoute].forEach(layer => { if (layer) map.removeLayer(layer); }); outbound = returnRoute = null; routePoints = []; document.getElementById('download').disabled = true; }
+    function showDraft() {
+      const end = destinationData(); const pivot = { lat:(start.lat + end.lat)/2 + .022, lng:(start.lng + end.lng)/2 - .014 };
+      const backPivot = { lat:(start.lat + end.lat)/2 - .018, lng:(start.lng + end.lng)/2 + .025 };
+      routePoints = [start, pivot, end, backPivot, start];
+      outbound = L.polyline([start,pivot,end], { color:'#1769aa', weight:5, opacity:.85 }).addTo(map);
+      returnRoute = L.polyline([end,backPivot,start], { color:'#d36b21', weight:5, opacity:.85, dashArray:'8 8' }).addTo(map);
+      const km = Math.round(map.distance(start,end) * 2.15 / 1000);
+      document.getElementById('distance').textContent = 'ca. ' + km + ' km (Entwurf)';
+      document.getElementById('duration').textContent = 'ca. ' + Math.round(km / 14 * 10) / 10 + ' Std.';
+      document.getElementById('download').disabled = false;
+      status.textContent = 'Planungsentwurf angezeigt. Für eine echte, straßengenaue Route bitte einen eigenen OpenRouteService-Schlüssel eintragen.';
+    }
+    async function calculate() {
+      if (!start) { status.textContent = 'Bitte zuerst den Startpunkt auf der Karte setzen.'; return; }
+      clearRoute(); const end = destinationData(); const key = document.getElementById('orsKey').value.trim();
+      if (!key) { showDraft(); return; }
+      status.textContent = 'Route wird berechnet …';
+      try {
+        const profile = 'cycling-regular';
+        const options = { avoid_features: document.getElementById('avoidBusy').checked ? ['highways','ferries'] : [] };
+        const routeRequest = coordinates => fetch('https://api.openrouteservice.org/v2/directions/' + profile + '/geojson', { method:'POST', headers:{'Authorization':key,'Content-Type':'application/json'}, body:JSON.stringify({ coordinates, preference: document.getElementById('avoidBusy').checked ? 'recommended' : 'fastest', options }) });
+        const via = [(start.lng + end.lng) / 2 + .020, (start.lat + end.lat) / 2 - .018];
+        const [outRes, backRes] = await Promise.all([routeRequest([[start.lng,start.lat],[end.lng,end.lat]]), routeRequest([[end.lng,end.lat],via,[start.lng,start.lat]])]);
+        if (!outRes.ok || !backRes.ok) throw new Error('Routendienst antwortet mit ' + (!outRes.ok ? outRes.status : backRes.status));
+        const [outData, backData] = await Promise.all([outRes.json(),backRes.json()]);
+        const outCoords = outData.features[0].geometry.coordinates.map(p => ({lat:p[1],lng:p[0]})); const backCoords = backData.features[0].geometry.coordinates.map(p => ({lat:p[1],lng:p[0]}));
+        const outSummary = outData.features[0].properties.summary, backSummary = backData.features[0].properties.summary;
+        routePoints = outCoords.concat(backCoords.slice(1)); outbound = L.geoJSON(outData, { style:{ color:'#1769aa', weight:5 } }).addTo(map);
+        returnRoute = L.geoJSON(backData, { style:{ color:'#d36b21', weight:4, dashArray:'8 8', opacity:.8 } }).addTo(map);
+        map.fitBounds(L.featureGroup([outbound,returnRoute]).getBounds().pad(.15)); const totalKm = (outSummary.distance + backSummary.distance) / 1000; const totalMinutes = (outSummary.duration + backSummary.duration) / 60;
+        document.getElementById('distance').textContent = totalKm.toFixed(1) + ' km gesamt'; document.getElementById('duration').textContent = Math.round(totalMinutes) + ' Min. ohne Pausen'; document.getElementById('download').disabled = false;
+        status.textContent = 'Hin- und Rückweg wurden getrennt berechnet. Bitte die vorgeschlagenen Wege vor der Fahrt auf Anhänger-Tauglichkeit prüfen.';
+      } catch (error) { status.textContent = 'Die Route konnte nicht berechnet werden: ' + error.message; showDraft(); }
+    }
+    function downloadGpx() {
+      if (!routePoints.length) return; const name = destinationData().name;
+      const points = routePoints.map((p,i) => '<trkpt lat="'+p.lat.toFixed(6)+'" lon="'+p.lng.toFixed(6)+'"><name>'+(i === 0 ? 'Start' : i === routePoints.length-1 ? 'Ziel' : 'Routenpunkt')+'</name></trkpt>').join('');
+      const gpx = '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Familien-Radtourenplaner" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>Geldern – '+name+'</name><trkseg>'+points+'</trkseg></trk></gpx>';
+      const link = document.createElement('a'); link.href=URL.createObjectURL(new Blob([gpx],{type:'application/gpx+xml'})); link.download='geldern-'+destination.value+'.gpx'; link.click(); URL.revokeObjectURL(link.href);
+    }
+    document.getElementById('setStart').addEventListener('click', () => { status.textContent = 'Klicke jetzt auf die Karte – dort wird der Startpunkt gesetzt.'; map.once('click', e => setStart(e.latlng)); });
+    destination.addEventListener('change', () => { updateDestination(); clearRoute(); }); document.getElementById('calculate').addEventListener('click', calculate); document.getElementById('download').addEventListener('click', downloadGpx);
+    updateDestination();
+  </script>
+</body>
+</html>
