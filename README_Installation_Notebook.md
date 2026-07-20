@@ -29,6 +29,7 @@ Das Skript klont diese Projekte und richtet die Synchronisation ein:
 - `Sommer Party`
 - `freizeitexperten.de\freizeitexperten-erp-dev-git`
 - `freizeitexperten.de\plugins-work`
+- `Process Planetarium`
 - `Fokus Tracker Website` im Google-Drive-Ordner
 
 Falls GitHub beim ersten privaten Repository eine Anmeldung verlangt, melde dich im geöffneten Browserfenster an. Alternativ kann die Anmeldung gezielt gestartet werden:
@@ -53,7 +54,31 @@ schtasks /Query /TN "Codex Git Auto-Sync"
 schtasks /Query /TN "Codex Drive Data Backup"
 ```
 
-## 4. Projekte in Codex öffnen
+## 4. Neue Projekte automatisch synchronisieren
+
+Die sechs vorhandenen Projekte sind bereits registriert. Für jedes neue, eigenständige Projekt wird ein privates GitHub-Repository erstellt und es wird auf dem anderen Gerät beim nächsten Git-Abgleich automatisch geklont.
+
+Vor der ersten Projekterstellung auf einem Gerät einmalig anmelden:
+
+```powershell
+gh auth login --web
+```
+
+Ein neues leeres Projekt unter `Dokumente` anlegen und registrieren:
+
+```powershell
+& "$HOME\Documents\Chris Derix Privat\scripts\new-synced-project.ps1" -Name "Mein neues Projekt"
+```
+
+Einen bereits angelegten Projektordner registrieren, ohne Dateien zu verschieben:
+
+```powershell
+& "$HOME\Documents\Chris Derix Privat\scripts\new-synced-project.ps1" -Name "Mein neues Projekt" -Path "C:\Pfad\zum\Projekt"
+```
+
+Der Befehl richtet Git ein, erstellt ein privates GitHub-Repository, ignoriert typische Zugangsdaten und ergänzt die zentrale Projektliste. Projektordner innerhalb von `Chris Derix Privat` werden ebenfalls über die zentrale Wissensbasis synchronisiert.
+
+## 5. Projekte in Codex öffnen
 
 Füge in der Codex-App bei **Projekte** die gewünschten Ordner hinzu. Wichtig ist insbesondere:
 
