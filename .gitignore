@@ -22,5 +22,6 @@ venv/
 # Editor- und Betriebssystemdateien
 .vscode/
 .idea/
+.ssh/
 Thumbs.db
 .DS_Store
