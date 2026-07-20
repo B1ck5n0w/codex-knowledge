@@ -2,6 +2,7 @@
 param(
     [Parameter(Mandatory)]
     [string]$Name,
+    [string]$Path,
     [ValidateSet('Documents', 'GoogleDrive')]
     [string]$Location = 'Documents'
 )
@@ -18,7 +19,21 @@ if ($LASTEXITCODE -ne 0) {
     throw 'GitHub CLI ist noch nicht angemeldet. Einmalig ausführen: gh auth login --web'
 }
 
-if ($Location -eq 'GoogleDrive') {
+if ($Path) {
+    $target = [IO.Path]::GetFullPath($Path)
+    if (-not (Test-Path -LiteralPath $target)) { throw "Projektordner wurde nicht gefunden: $target" }
+
+    $drive = Get-PSDrive -PSProvider FileSystem |
+        Where-Object { $target.StartsWith($_.Root, [StringComparison]::OrdinalIgnoreCase) } |
+        Select-Object -First 1
+    if ($target.StartsWith($documentsRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        $configPath = [IO.Path]::GetRelativePath($workspaceRoot, $target)
+    } elseif ($drive) {
+        $configPath = 'drive:' + [IO.Path]::GetRelativePath($drive.Root, $target)
+    } else {
+        throw 'Der Projektordner muss unter Dokumente oder in einem verbundenen Drive liegen.'
+    }
+} elseif ($Location -eq 'GoogleDrive') {
     $driveRelativePath = 'Meine Ablage\Projekte\KI Projekte'
     $projectRoot = Get-PSDrive -PSProvider FileSystem |
         ForEach-Object { Join-Path $_.Root $driveRelativePath } |
@@ -34,11 +49,9 @@ if ($Location -eq 'GoogleDrive') {
 
 if (Test-Path -LiteralPath (Join-Path $target '.git')) { throw "Bereits ein Git-Projekt: $target" }
 New-Item -ItemType Directory -Path $target -Force | Out-Null
-if ((Get-ChildItem -LiteralPath $target -Force | Measure-Object).Count -gt 0) {
-    throw "Der Zielordner ist nicht leer: $target. Verschiebe die Dateien zuerst oder richte Git dort bewusst manuell ein."
-}
 
 git -C $target init -b main
+if (-not (Test-Path -LiteralPath (Join-Path $target '.gitignore'))) {
 @'
 .env
 .env.*
@@ -51,8 +64,17 @@ dist/
 __pycache__/
 .venv/
 '@ | Set-Content -LiteralPath (Join-Path $target '.gitignore') -NoNewline
-git -C $target add .gitignore
-git -C $target commit -m 'Initial project setup'
+}
+git -C $target add -A
+$sensitivePaths = @(git -C $target diff --cached --name-only | Where-Object {
+    $_ -match '(^|/)\.env($|\.)' -or $_ -match '(?i)\.(pem|key|pfx|p12|crt)$'
+})
+if ($sensitivePaths.Count -gt 0) {
+    git -C $target restore --staged -- $sensitivePaths
+    Write-Warning ('Nicht eingecheckt (sensible Dateien): ' + ($sensitivePaths -join ', '))
+}
+git -C $target diff --cached --quiet
+if ($LASTEXITCODE -eq 1) { git -C $target commit -m 'Initial project setup' }
 gh repo create "$owner/$slug" --private --source $target --remote origin --push
 if ($LASTEXITCODE -ne 0) { throw "GitHub-Repository konnte nicht erstellt werden: $owner/$slug" }
 
