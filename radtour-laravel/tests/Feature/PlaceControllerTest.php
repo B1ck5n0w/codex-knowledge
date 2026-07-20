@@ -89,4 +89,27 @@ class PlaceControllerTest extends TestCase
 
         Http::assertSentCount(1);
     }
+
+    public function test_invalid_search_inputs_are_rejected_without_an_external_request(): void
+    {
+        Http::fake();
+
+        $this->postJson('/api/places/search', [
+            'text' => 'Café',
+            'latitude' => 51.584,
+            'longitude' => 6.252,
+            'radius' => 26000,
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('radius');
+
+        $this->postJson('/api/places/search', [
+            'text' => 'Café',
+            'latitude' => 91,
+            'longitude' => 6.252,
+            'radius' => 500,
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('latitude');
+
+        Http::assertNothingSent();
+    }
 }

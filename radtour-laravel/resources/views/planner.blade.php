@@ -597,7 +597,10 @@
     refreshGoogleUsage(); setInterval(refreshGoogleUsage,30000);
     setTimeout(() => window.lucide?.createIcons({attrs:{'aria-hidden':'true'}}), 0);
     // Die voreingestellte Heimatadresse wird direkt als sichtbarer Startpunkt gesetzt.
-    setTimeout(findStartAddress,650);
+    // Die vorausgefüllte Adresse ist nur eine Starthilfe. Setzt jemand vorher
+    // bewusst einen Punkt auf der Karte oder nutzt den aktuellen Standort,
+    // darf die verzögerte Adresssuche diese Auswahl nicht wieder überschreiben.
+    setTimeout(() => { if (!start) findStartAddress(); },650);
   </script>
 </body>
 </html>
