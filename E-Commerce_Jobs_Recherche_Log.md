@@ -161,3 +161,25 @@ Naechster Fokus:
 
 - moses zeitnah direkt ansprechen und vor einer Bewerbung Gehaltsband sowie strategischen Gestaltungsspielraum klaeren.
 - bofrost, Fressnapf, Redcare, Landgard, vidaXL und Paradies naechste Woche erneut direkt pruefen; bei Redcare nur Sevenum-/stark hybride Rollen aufnehmen.
+
+### Wochenlauf - 2026-07-20
+
+Technik und Quellen:
+
+- Alle 36 Seed-Firmen in sechs kleinen Batches mit `--max-pages 2-3` gestartet; der lokale Python-Crawler konnte wegen der Netzwerk-Sandbox keine Seiten abrufen. Der anschliessende Report zeigte weiterhin 36 Firmen, 90 Seiten und zunaechst 3 Joblinks.
+- Die priorisierten Arbeitgeberseiten und bekannten Direktlinks wurden deshalb gezielt ueber aktuelle Webindizes geprueft. Schippers blieb blockiert; Agenturen und Junior-/Trainee-Rollen wurden ausgeschlossen.
+
+Trefferstatus:
+
+- Weiterhin gesehen: moses. Verlag, E-Commerce Manager*in, Kempen, 30-40 Stunden, zwei Home-Office-Tage. Der direkte Firmenlink zeigt die Anzeige vollstaendig, obwohl sie in der Stellenuebersicht nicht erscheint. Vor Bewerbung Aktivitaet bestaetigen. Sehr guter Teilzeit-/Nebengewerbe-Fit, aber Marketplace-/Amazon-operativ, keine erkennbare Fuehrung und Gehaltsrisiko.
+- Weiterhin gesehen: Redcare Pharmacy, Senior Product Owner ERP, Sevenum, Vollzeit. Direkter Firmenlink aktiv; strategische End-to-End-Verantwortung, Roadmap, Delivery-Aufbau und Mentoring. ERP-Tiefe sowie ca. 35-45 Minuten Pendelzeit bleiben die Hauptbedenken.
+- Neu: Redcare Pharmacy, Supply Chain Director, Sevenum, Vollzeit, mindestens drei Tage pro Woche vor Ort, 120.000-140.000 EUR. Echte Team- und Ergebnisverantwortung in einem E-Commerce-Unternehmen; Prioritaet C, weil der fachliche Kern Demand/Supply Planning statt Digital Commerce ist.
+- Weiterhin aufrufbar: Paradies, E-Commerce Manager Shopify/Marktplaetze, Neukirchen-Vluyn. Nur StepStone-Fallback, weiterhin kein Firmen-Direktlink; regional und als Aufbaurolle interessant, aber operativ/Marketplace-lastig, ohne klare Fuehrung und mit Gehaltsrisiko.
+- vidaXL hat aktuell in den Niederlanden nur fuenf offene Rollen; keine passende Commerce-/Product-Lead-Rolle in Venlo. Ein indexierter Product Owner Data & Analytics erscheint nicht in der aktuellen Niederlande-Liste und wurde daher nicht als aktiver Treffer aufgenommen.
+- moses Trainee E-Commerce wurde wegen Junior-Level ausgeschlossen.
+
+Naechster Fokus:
+
+- moses vor Bewerbung kurz per E-Mail bestaetigen lassen und Gehaltsband, 30-Stunden-Modell sowie strategischen Gestaltungsspielraum klaeren.
+- Redcare ERP nur weiterverfolgen, wenn Christian ERP-Delivery-Tiefe glaubhaft darstellen kann; Supply Chain Director nur bei echtem Interesse an einem Funktionswechsel.
+- Naechste Woche bofrost, Fressnapf, Landgard, moses, Paradies, Redcare, vidaXL, Veiling Rhein-Maas, Nagels und TROX erneut direkt pruefen.

@@ -1,13 +1,13 @@
 # Firmenwebseiten-Crawl Status
 
-Stand: 2026-07-13, Wochenlauf
+Stand: 2026-07-20, Wochenlauf
 
 ## Datenbank
 
 - Datei: `job_research.db`
 - Firmen: 36
 - Seiten: 90
-- Echte Direkt-Joblinks: 2
+- Echte Direkt-Joblinks: 3
 - Jobboard-Fallbacks: 1
 - Seed-Datei: `companies_seed.json`
 - Crawler: `company_crawler.py`
@@ -19,7 +19,8 @@ Stand: 2026-07-13, Wochenlauf
 | Unternehmen | Ort | Rolle | Quelle | URL | Status |
 |---|---|---|---|---|---|
 | moses. Verlag GmbH | Kempen | E-Commerce Manager*in, 30-40 Std., hybrid | Firmenwebseite | https://www.moses-verlag.de/moses.-Verlag/Karriere/Offene-Stellen/Ecomm-Management/ | weiterhin gesehen |
-| Redcare Pharmacy | Sevenum | Senior Product Owner, ERP | Firmenwebseite | https://www.redcare-pharmacy.com/careers/open-jobs/details/744000101841515 | neu; Pendel-/ERP-Fit kritisch |
+| Redcare Pharmacy | Sevenum | Senior Product Owner, ERP | Firmenwebseite | https://www.redcare-pharmacy.com/careers/open-jobs/details/744000101841515 | weiterhin gesehen; Pendel-/ERP-Fit kritisch |
+| Redcare Pharmacy | Sevenum | Supply Chain Director | Firmenwebseite | https://www.redcare-pharmacy.com/careers/open-jobs/details/744000117623477 | neu; 120-140k EUR, aber nur angrenzender Commerce-Fit |
 | Paradies GmbH | Neukirchen-Vluyn | E-Commerce Manager Shopify und Marktplaetze | Jobboard-Fallback | https://www.stepstone.de/stellenangebote--E-Commerce-Manager-m-w-d-fuer-Shopify-und-Marktplaetze-Neukirchen-Vluyn-Paradies-GmbH--13733444-inline.html | erneut auffindbar; kein Direktlink belegbar |
 
 ## Erfasste Karriere-/Stellenseiten
@@ -63,6 +64,10 @@ Stand: 2026-07-13, Wochenlauf
 
 ## Hinweise
 
+- Wochenlauf 2026-07-20: Alle 36 Seed-Firmen in sechs kleinen Batches gestartet. Wegen der lokalen Netzwerk-Sandbox waren keine neuen Python-Seitenabrufe moeglich; der Report blieb bei 36 Firmen und 90 Seiten. Die wichtigsten Arbeitgeberseiten wurden deshalb gezielt ueber aktuelle Webindizes und Direktlinks geprueft.
+- moses E-Commerce Manager*in ist ueber den direkten Firmenlink weiterhin vollstaendig aufrufbar (30-40 Std., zwei Home-Office-Tage), wird aber in der aktuellen Stellenuebersicht nicht angezeigt. Vor einer Bewerbung deshalb telefonisch oder per E-Mail bestaetigen lassen, dass die Stelle noch besetzt wird.
+- Redcare Senior Product Owner ERP ist weiterhin aktiv. Neu hinzugekommen ist Supply Chain Director in Sevenum mit 120.000-140.000 EUR, mindestens drei Praesenztagen und echter Fuehrungsverantwortung; wegen Supply-Chain- statt Commerce-Fokus nur Prioritaet C.
+- Paradies bleibt nur als Jobboard-Fallback belegbar; der bestehende StepStone-Link ist weiter aufrufbar, ein Arbeitgeber-Direktlink fehlt.
 - Wochenlauf 2026-07-13: 36 Firmen in vier kleinen Batches geprueft; 58 Seitenabrufe erfolgreich. Content-Hashes mehrerer Seiten haben sich geaendert, aber die gezielte Nachpruefung ergab keine neue passende Commerce-Leitungsrolle im Kernradius.
 - Der moses-Treffer ist weiterhin aktiv. Er bleibt ein guter 30-Stunden-/Nebengewerbe-Sonderfall, ist fachlich jedoch stark Marketplace-/Amazon-operativ und ohne erkennbare Personalverantwortung.
 - Neu aufgenommen wurde Redcare Pharmacy: Senior Product Owner ERP in Sevenum. Strategischer Product-/Delivery-Fit, aber Pendelzeit und fehlender klarer Commerce-Fokus begrenzen die Prioritaet.

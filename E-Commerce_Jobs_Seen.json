@@ -1,7 +1,7 @@
 {
   "profile": "Christian Derix - E-Commerce-Leitung / Digital Commerce",
   "created_at": "2026-07-10",
-  "last_run_at": "2026-07-13",
+  "last_run_at": "2026-07-20",
   "jobs": [
     {
       "id": "stepstone-paradies-ecommerce-manager-shopify-marketplaetze-13898150",
@@ -13,7 +13,7 @@
       "status": "seen",
       "source": "Jobboard-Fallback",
       "published_at": "2026-03-06",
-      "notes": "Am 2026-07-13 erneut ueber StepStone auffindbar; Firmen-Karriereseite lieferte 503 und kein Direktlink war belegbar. Regional interessante Aufbauarbeit, aber Shopify/Marketplace-operativ, ohne klare Fuehrung und mit Gehaltsrisiko."
+      "notes": "Am 2026-07-20 ueber den bestehenden StepStone-Link weiterhin aufrufbar; auf der Firmen-Karriereseite kein Direktlink belegbar. Regional interessante Aufbauarbeit, aber Shopify/Marketplace-operativ, ohne klare Fuehrung und mit Gehaltsrisiko."
     },
     {
       "id": "stepstone-artitree-ecommerce-channel-manager-13921443",
@@ -55,7 +55,7 @@
       "status": "seen",
       "source": "Firmenwebseite",
       "work_time": "30-40 Std., hybrides Arbeiten moeglich",
-      "notes": "Interessanter Teilzeit-Sonderfall: echter Firmenlink, Kempen, 30 Stunden moeglich und dadurch gut fuer Nebengewerbe chris-derix.de. Bedenken: starker Marketplace-/Amazon- und operativer Anteil, keine klare Fuehrungsrolle."
+      "notes": "Am 2026-07-20 ueber den direkten Firmenlink weiterhin vollstaendig aufrufbar, obwohl die Stellenuebersicht ihn nicht listet. Interessanter Teilzeit-Sonderfall: Kempen, 30 Stunden moeglich und dadurch gut fuer Nebengewerbe chris-derix.de. Bedenken: starker Marketplace-/Amazon- und operativer Anteil, keine klare Fuehrungsrolle."
     },
     {
       "id": "redcare-sevenum-senior-product-owner-erp-744000101841515",
@@ -64,11 +64,24 @@
       "title": "Senior Product Owner, ERP (m/f/d)",
       "url": "https://www.redcare-pharmacy.com/careers/open-jobs/details/744000101841515",
       "priority": "C",
-      "status": "new",
+      "status": "seen",
       "source": "Firmenwebseite",
       "published_at": "30+ Days Ago",
       "work_time": "Vollzeit; kein Remote-/Hybrid-Hinweis auf der Anzeige sichtbar",
-      "notes": "Strategische End-to-End-Verantwortung, ERP-Roadmap, Delivery-Aufbau und Mentoring passen zur Business-IT-Bruecke. Bedenken: Sevenum wahrscheinlich rund 35-45 Minuten, ERP statt Digital Commerce, einschlaegige ERP-Tiefe gefordert."
+      "notes": "Am 2026-07-20 direkt auf der Firmenwebseite weiterhin aktiv. Strategische End-to-End-Verantwortung, ERP-Roadmap, Delivery-Aufbau und Mentoring passen zur Business-IT-Bruecke. Bedenken: Sevenum wahrscheinlich rund 35-45 Minuten, ERP statt Digital Commerce, einschlaegige ERP-Tiefe gefordert."
+    },
+    {
+      "id": "redcare-sevenum-supply-chain-director-744000117623477",
+      "company": "Redcare Pharmacy",
+      "location": "Sevenum",
+      "title": "Supply Chain Director (m/w/d)",
+      "url": "https://www.redcare-pharmacy.com/careers/open-jobs/details/744000117623477",
+      "priority": "C",
+      "status": "new",
+      "source": "Firmenwebseite",
+      "published_at": "2026-06-09",
+      "work_time": "Vollzeit; mindestens 3 Tage pro Woche vor Ort in Sevenum",
+      "notes": "120.000-140.000 EUR/Jahr, echte Team- und Ergebnisverantwortung in Europas groesster Online-Apotheke. Nur angrenzender Fit: Demand/Supply Planning statt Digital Commerce; Pendelzeit ca. 35-45 Minuten und hohe Praesenzpflicht."
     }
   ],
   "watchlist_companies": [
