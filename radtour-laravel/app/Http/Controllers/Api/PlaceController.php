@@ -87,7 +87,9 @@ class PlaceController extends Controller
             'https://overpass.kumi.systems/api/interpreter',
         ] as $endpoint) {
             try {
-                $response = Http::asForm()->acceptJson()->timeout(8)->post($endpoint, [
+                // Die Oberfläche soll nicht minutenlang auf einen überlasteten
+                // Community-Dienst warten. Danach wird der zweite Anbieter versucht.
+                $response = Http::asForm()->acceptJson()->timeout(3)->post($endpoint, [
                     'data' => $query,
                 ]);
 
