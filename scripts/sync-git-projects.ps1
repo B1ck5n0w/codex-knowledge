@@ -31,10 +31,20 @@ function Get-SensitivePaths {
 }
 
 foreach ($entry in $config.projects) {
-    $project = if ([IO.Path]::IsPathRooted($entry)) {
+    $project = if ($entry.StartsWith('drive:', [StringComparison]::OrdinalIgnoreCase)) {
+        $driveRelativePath = $entry.Substring(6)
+        Get-PSDrive -PSProvider FileSystem |
+            ForEach-Object { Join-Path $_.Root $driveRelativePath } |
+            Where-Object { Test-Path -LiteralPath $_ } |
+            Select-Object -First 1
+    } elseif ([IO.Path]::IsPathRooted($entry)) {
         [IO.Path]::GetFullPath($entry)
     } else {
         [IO.Path]::GetFullPath((Join-Path $workspaceRoot $entry))
+    }
+    if ([string]::IsNullOrWhiteSpace($project)) {
+        Write-Warning "Übersprungen: Drive-Projekt wurde nicht gefunden: $entry"
+        continue
     }
     Write-Host "`n==> $project"
 
