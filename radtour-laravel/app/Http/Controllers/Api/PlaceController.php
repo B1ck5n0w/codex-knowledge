@@ -17,9 +17,18 @@ class PlaceController extends Controller
      */
     private function googleHttp()
     {
-        return Http::acceptJson()->withOptions([
-            'curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4],
-        ]);
+        $request = Http::acceptJson();
+
+        // cURL ist in manchen lokalen PHP-Installationen nicht aktiviert. Dann
+        // bleibt Google Places nutzbar, statt mit einer undefinierten Konstante
+        // abzubrechen. Mit cURL wird weiter bewusst IPv4 bevorzugt.
+        if (defined('CURLOPT_IPRESOLVE') && defined('CURL_IPRESOLVE_V4')) {
+            $request = $request->withOptions([
+                'curl' => [\CURLOPT_IPRESOLVE => \CURL_IPRESOLVE_V4],
+            ]);
+        }
+
+        return $request;
     }
 
     private function placesUsage(): array
@@ -81,21 +90,36 @@ class PlaceController extends Controller
             return response()->json(['message' => 'Ungültige Kartenabfrage.'], 422);
         }
 
+        $cacheKey = 'overpass:'.hash('sha256', $query);
+        $cached = Cache::get($cacheKey);
+        if (is_array($cached)) {
+            return response()->json(['elements' => $cached]);
+        }
+
         $lastError = null;
         foreach ([
             'https://overpass-api.de/api/interpreter',
             'https://overpass.kumi.systems/api/interpreter',
         ] as $endpoint) {
             try {
-                // Die Oberfläche soll nicht minutenlang auf einen überlasteten
-                // Community-Dienst warten. Danach wird der zweite Anbieter versucht.
-                $response = Http::asForm()->acceptJson()->timeout(2)->post($endpoint, [
-                    'data' => $query,
-                ]);
+                // Komplexe Korridor-Abfragen benötigen gelegentlich einige
+                // Sekunden. Das Limit bleibt bewusst kurz, aber 2 Sekunden waren
+                // für reale Familienrouten zu aggressiv.
+                $response = Http::asForm()
+                    ->acceptJson()
+                    ->withUserAgent('Familien-Radtourenplaner/1.0 (+http://127.0.0.1:8081)')
+                    ->connectTimeout(2)
+                    ->timeout(4)
+                    ->post($endpoint, [
+                        'data' => $query,
+                    ]);
 
                 if ($response->successful()) {
+                    $elements = $response->json('elements', []);
+                    Cache::put($cacheKey, $elements, now()->addMinutes(20));
+
                     return response()->json([
-                        'elements' => $response->json('elements', []),
+                        'elements' => $elements,
                     ]);
                 }
 
