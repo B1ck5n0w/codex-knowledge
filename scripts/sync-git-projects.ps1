@@ -53,9 +53,18 @@ foreach ($projectDefinition in $config.projects) {
     }
     Write-Host "`n==> $project"
 
-    if (-not (Test-Path -LiteralPath $project) -and -not [string]::IsNullOrWhiteSpace($repository)) {
-        $parent = Split-Path -Parent $project
-        New-Item -ItemType Directory -Path $parent -Force | Out-Null
+    $hasGitDirectory = Test-Path -LiteralPath (Join-Path $project '.git')
+    if (-not $hasGitDirectory -and -not [string]::IsNullOrWhiteSpace($repository)) {
+        if (Test-Path -LiteralPath $project) {
+            $items = @(Get-ChildItem -LiteralPath $project -Force)
+            if ($items.Count -gt 0) {
+                Write-Warning 'Übersprungen: Zielordner ist belegt, aber kein Git-Repository.'
+                continue
+            }
+        } else {
+            $parent = Split-Path -Parent $project
+            New-Item -ItemType Directory -Path $parent -Force | Out-Null
+        }
         & git clone $repository $project
         if ($LASTEXITCODE -ne 0) {
             Write-Warning "Übersprungen: Klonen fehlgeschlagen: $repository"
