@@ -30,7 +30,12 @@ function Get-SensitivePaths {
     })
 }
 
-foreach ($entry in $config.projects) {
+foreach ($projectDefinition in $config.projects) {
+    # Older entries are simple paths. New project entries can additionally
+    # provide their GitHub repository, which allows a second device to clone
+    # a project automatically when it is first seen.
+    $entry = if ($projectDefinition -is [string]) { $projectDefinition } else { $projectDefinition.path }
+    $repository = if ($projectDefinition -is [string]) { $null } else { $projectDefinition.repository }
     $project = if ($entry.StartsWith('drive:', [StringComparison]::OrdinalIgnoreCase)) {
         $driveRelativePath = $entry.Substring(6)
         Get-PSDrive -PSProvider FileSystem |
@@ -47,6 +52,16 @@ foreach ($entry in $config.projects) {
         continue
     }
     Write-Host "`n==> $project"
+
+    if (-not (Test-Path -LiteralPath $project) -and -not [string]::IsNullOrWhiteSpace($repository)) {
+        $parent = Split-Path -Parent $project
+        New-Item -ItemType Directory -Path $parent -Force | Out-Null
+        & git clone $repository $project
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Übersprungen: Klonen fehlgeschlagen: $repository"
+            continue
+        }
+    }
 
     if (-not (Test-Path -LiteralPath (Join-Path $project '.git'))) {
         Write-Warning 'Übersprungen: kein Git-Repository.'

@@ -4,7 +4,10 @@
     "..\\freizeitexperten.de\\freizeitexperten-erp-dev-git",
     "..\\freizeitexperten.de\\plugins-work",
     "..\\Sommer Party",
-    "..\\Process Planetarium",
+    {
+      "path": "..\\Process Planetarium",
+      "repository": "https://github.com/B1ck5n0w/process-planetarium.git"
+    },
     "drive:Meine Ablage\\Projekte\\KI Projekte\\Fokus Tracker Website"
   ]
 }

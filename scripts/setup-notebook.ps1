@@ -37,20 +37,26 @@ function Get-OrCloneProject {
 
 Initialize-GitHubCredentials
 
-Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/sommer-party.git' -Target (Join-Path $DocumentsRoot 'Sommer Party')
-Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/freizeitexperten-erp-dev.git' -Target (Join-Path $DocumentsRoot 'freizeitexperten.de\freizeitexperten-erp-dev-git')
-Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/freizeitexperten-plugins-work.git' -Target (Join-Path $DocumentsRoot 'freizeitexperten.de\plugins-work')
-Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/process-planetarium.git' -Target (Join-Path $DocumentsRoot 'Process Planetarium')
-
-$driveRelativePath = 'Meine Ablage\Projekte\KI Projekte'
-$driveProjectRoot = Get-PSDrive -PSProvider FileSystem |
-    ForEach-Object { Join-Path $_.Root $driveRelativePath } |
-    Where-Object { Test-Path -LiteralPath $_ } |
-    Select-Object -First 1
-if ($driveProjectRoot) {
-    Get-OrCloneProject -Repository 'https://github.com/B1ck5n0w/fokus-tracker-website.git' -Target (Join-Path $driveProjectRoot 'Fokus Tracker Website')
-} else {
-    Write-Warning 'Google Drive ist noch nicht verfügbar; Fokus Tracker Website wird beim nächsten Setup-Lauf geklont.'
+ $config = Get-Content -Raw -LiteralPath (Join-Path $DocumentsRoot 'Chris Derix Privat\sync-projects.json') | ConvertFrom-Json
+foreach ($projectDefinition in $config.projects) {
+    if ($projectDefinition -is [string] -or [string]::IsNullOrWhiteSpace($projectDefinition.repository)) { continue }
+    $entry = $projectDefinition.path
+    $target = if ($entry.StartsWith('drive:', [StringComparison]::OrdinalIgnoreCase)) {
+        $driveRelativePath = $entry.Substring(6)
+        Get-PSDrive -PSProvider FileSystem |
+            ForEach-Object { Join-Path $_.Root $driveRelativePath } |
+            Where-Object { Test-Path -LiteralPath $_ } |
+            Select-Object -First 1
+    } elseif ([IO.Path]::IsPathRooted($entry)) {
+        [IO.Path]::GetFullPath($entry)
+    } else {
+        [IO.Path]::GetFullPath((Join-Path $DocumentsRoot 'Chris Derix Privat' $entry))
+    }
+    if ([string]::IsNullOrWhiteSpace($target)) {
+        Write-Warning "Projektstandort nicht verfügbar: $entry"
+        continue
+    }
+    Get-OrCloneProject -Repository $projectDefinition.repository -Target $target
 }
 
 & (Join-Path $PSScriptRoot 'install-auto-sync.ps1') -IntervalMinutes 15
