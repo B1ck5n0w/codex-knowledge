@@ -558,7 +558,12 @@
       const waypoints=[point('wpt',start,'Startpunkt','Flag, Blue'),...selectedStops.map(stop=>point('wpt',stop,stop.name,'Restroom')),point('wpt',destinationData(),'Ziel: '+name,'Flag, Green')].join('');
       const points = routePoints.map((p,i) => '<trkpt lat="'+p.lat.toFixed(6)+'" lon="'+p.lng.toFixed(6)+'"><name>'+xml(i === 0 || i === routePoints.length-1 ? 'Startpunkt' : i === forwardCoords.length-1 ? 'Ziel' : 'Routenpunkt')+'</name></trkpt>').join('');
       const tourName='Geldern – '+name, gpx = '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Familien-Radtourenplaner" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd"><metadata><name>'+xml(tourName)+'</name><time>'+new Date().toISOString()+'</time></metadata>'+waypoints+'<trk><name>'+xml(tourName)+'</name><type>cycling</type><trkseg>'+points+'</trkseg></trk></gpx>';
-      const link = document.createElement('a'); link.href=URL.createObjectURL(new Blob([gpx],{type:'application/gpx+xml'})); link.download='geldern-'+destination.value+'.gpx'; link.click(); URL.revokeObjectURL(link.href);
+      const filename='geldern-'+destination.value+'.gpx', url=URL.createObjectURL(new Blob([gpx],{type:'application/gpx+xml'}));
+      // Einige Browser starten den Download erst nach dem aktuellen Event-Loop.
+      // Deshalb den Link kurz im DOM halten und die Blob-URL erst danach freigeben.
+      const link=document.createElement('a'); link.href=url; link.download=filename; link.hidden=true; document.body.appendChild(link); link.click(); link.remove();
+      window.setTimeout(()=>URL.revokeObjectURL(url),1500);
+      status.textContent='GPX-Download wurde gestartet: '+filename+'. Die Datei liegt normalerweise im Download-Ordner des Browsers.';
     }
     function renderSavedTours() {
       const list=document.getElementById('savedTours'), tours=savedTours();

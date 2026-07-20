@@ -10,6 +10,18 @@ use Illuminate\Support\Facades\Http;
 
 class PlaceController extends Controller
 {
+    /**
+     * Der lokale Anschluss verwendet eine wechselnde IPv6-Adresse. Places-Anfragen
+     * werden deshalb bewusst über IPv4 ausgelöst, damit die IP-Einschränkung des
+     * Server-Schlüssels dauerhaft mit der stabilen IPv4-Adresse funktioniert.
+     */
+    private function googleHttp()
+    {
+        return Http::acceptJson()->withOptions([
+            'curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4],
+        ]);
+    }
+
     private function placesUsage(): array
     {
         $date = now()->toDateString();
@@ -135,7 +147,7 @@ class PlaceController extends Controller
         $latitudeDelta = $radius / 111320;
         $longitudeDelta = $radius / max(1, 111320 * cos(deg2rad((float) $data['latitude'])));
 
-        $response = Http::acceptJson()
+        $response = $this->googleHttp()
             ->withHeaders([
                 'X-Goog-Api-Key' => $key,
                 // Keep the discovery request deliberately lean. Rich details and photos
@@ -210,7 +222,7 @@ class PlaceController extends Controller
             return $blocked;
         }
 
-        $response = Http::acceptJson()->withHeaders([
+        $response = $this->googleHttp()->withHeaders([
             'X-Goog-Api-Key' => $key,
             'X-Goog-FieldMask' => 'displayName,formattedAddress,regularOpeningHours,websiteUri,rating,userRatingCount,photos',
         ])->timeout(15)->get('https://places.googleapis.com/v1/places/'.$data['id']);
@@ -246,7 +258,7 @@ class PlaceController extends Controller
             return $blocked;
         }
 
-        $response = Http::acceptJson()->withHeaders(['X-Goog-Api-Key' => $key])->timeout(15)
+        $response = $this->googleHttp()->withHeaders(['X-Goog-Api-Key' => $key])->timeout(15)
             ->get('https://places.googleapis.com/v1/'.$data['name'].'/media', ['maxHeightPx' => 480, 'skipHttpRedirect' => 'true']);
 
         $payload = $response->json();
