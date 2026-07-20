@@ -1,13 +1,25 @@
 {
   "projects": [
     ".",
-    "..\\freizeitexperten.de\\freizeitexperten-erp-dev-git",
-    "..\\freizeitexperten.de\\plugins-work",
-    "..\\Sommer Party",
+    {
+      "path": "..\\freizeitexperten.de\\freizeitexperten-erp-dev-git",
+      "repository": "https://github.com/B1ck5n0w/freizeitexperten-erp-dev.git"
+    },
+    {
+      "path": "..\\freizeitexperten.de\\plugins-work",
+      "repository": "https://github.com/B1ck5n0w/freizeitexperten-plugins-work.git"
+    },
+    {
+      "path": "..\\Sommer Party",
+      "repository": "https://github.com/B1ck5n0w/sommer-party.git"
+    },
     {
       "path": "..\\Process Planetarium",
       "repository": "https://github.com/B1ck5n0w/process-planetarium.git"
     },
-    "drive:Meine Ablage\\Projekte\\KI Projekte\\Fokus Tracker Website"
+    {
+      "path": "drive:Meine Ablage\\Projekte\\KI Projekte\\Fokus Tracker Website",
+      "repository": "https://github.com/B1ck5n0w/fokus-tracker-website.git"
+    }
   ]
 }
