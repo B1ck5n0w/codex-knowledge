@@ -37,7 +37,12 @@ function Get-OrCloneProject {
 
 Initialize-GitHubCredentials
 
- $config = Get-Content -Raw -LiteralPath (Join-Path $DocumentsRoot 'Chris Derix Privat\sync-projects.json') | ConvertFrom-Json
+$workspaceRoot = Join-Path $DocumentsRoot 'Chris Derix Privat'
+$codexConfigRoot = Join-Path $env:USERPROFILE '.codex'
+New-Item -ItemType Directory -Path $codexConfigRoot -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $workspaceRoot 'config\codex-global-AGENTS.md') -Destination (Join-Path $codexConfigRoot 'AGENTS.md') -Force
+
+$config = Get-Content -Raw -LiteralPath (Join-Path $workspaceRoot 'sync-projects.json') | ConvertFrom-Json
 foreach ($projectDefinition in $config.projects) {
     if ($projectDefinition -is [string] -or [string]::IsNullOrWhiteSpace($projectDefinition.repository)) { continue }
     $entry = $projectDefinition.path
@@ -50,7 +55,7 @@ foreach ($projectDefinition in $config.projects) {
     } elseif ([IO.Path]::IsPathRooted($entry)) {
         [IO.Path]::GetFullPath($entry)
     } else {
-        [IO.Path]::GetFullPath((Join-Path $DocumentsRoot 'Chris Derix Privat' $entry))
+        [IO.Path]::GetFullPath((Join-Path $workspaceRoot $entry))
     }
     if ([string]::IsNullOrWhiteSpace($target)) {
         Write-Warning "Projektstandort nicht verfügbar: $entry"
