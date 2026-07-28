@@ -1,6 +1,6 @@
 # Codex auf dem Notebook einrichten
 
-Diese Anleitung richtet die bestehenden Codex-Projekte auf einem zweiten Windows-Gerät ein. Danach werden Code und Notizen über GitHub automatisch abgeglichen; große Arbeitsdaten liegen in Google Drive.
+Diese Anleitung richtet die bestehenden Codex-Projekte auf einem zweiten Windows-Gerät ein. Code und Notizen gleicht Codex bewusst nach einer abgeschlossenen Arbeitssitzung über GitHub ab; große Arbeitsdaten liegen in Google Drive.
 
 ## 1. Google Drive einrichten
 
@@ -40,11 +40,11 @@ git credential-manager github login --browser --username B1ck5n0w
 
 Die Anleitung enthält nur den Clone von `codex-knowledge` und den anschließenden Aufruf des Setup-Skripts; es gibt keinen Clone-Befehl mit einer `.ps1`-Zieldatei.
 
-## 3. Automatische Synchronisation prüfen
+## 3. Synchronisationsweise prüfen
 
-Das Skript richtet zwei Windows-Aufgaben ein:
+Das Skript richtet die Drive-Sicherung ein und deaktiviert einen eventuell noch vorhandenen zeitgesteuerten Git-Abgleich:
 
-- **Codex Git Auto-Sync:** alle 15 Minuten; zieht Änderungen, erstellt bei Bedarf einen Commit und pusht ihn nach GitHub.
+- **Codex Git Auto-Sync:** deaktiviert. Git wird von Codex innerhalb der jeweiligen Arbeitssitzung abgeglichen.
 - **Codex Drive Data Backup:** stündlich; sichert große Freizeitexperten-Arbeitsdaten in Google Drive.
 
 Prüfen in PowerShell:
@@ -54,9 +54,11 @@ schtasks /Query /TN "Codex Git Auto-Sync"
 schtasks /Query /TN "Codex Drive Data Backup"
 ```
 
-## 4. Neue Projekte automatisch synchronisieren
+Codex prüft vor Änderungen zunächst Git-Status und Remote-Stand. Nach erfolgreicher Umsetzung und Prüfung erstellt Codex einen aussagekräftigen Commit und pusht ihn. Konflikte, fehlende Berechtigungen oder mögliche sensible Dateien werden nicht erzwungen, sondern zur Klärung zurückgemeldet.
 
-Die sechs vorhandenen Projekte sind bereits registriert. Für jedes neue, eigenständige Projekt wird ein privates GitHub-Repository erstellt und es wird auf dem anderen Gerät beim nächsten Git-Abgleich automatisch geklont.
+## 4. Neue Projekte registrieren
+
+Die sechs vorhandenen Projekte sind bereits registriert. Für jedes neue, eigenständige Projekt wird ein privates GitHub-Repository erstellt und zentral eingetragen. Auf dem anderen Gerät wird es beim nächsten von Codex ausgeführten Git-Abgleich oder beim erneuten Ausführen des Setup-Skripts geklont.
 
 Vor der ersten Projekterstellung auf einem Gerät einmalig anmelden:
 
@@ -89,7 +91,7 @@ Füge in der Codex-App bei **Projekte** die gewünschten Ordner hinzu. Wichtig i
 ## Arbeitsregeln
 
 - Arbeite immer nur auf einem Gerät gleichzeitig.
-- Warte vor einem Gerätewechsel kurz, damit der GitHub-Abgleich abgeschlossen ist.
+- Warte vor einem Gerätewechsel, bis Codex den GitHub-Abgleich abgeschlossen hat.
 - Quellcode, Markdown und kleine Projektdateien gehören nach GitHub.
 - Große Medien, Datenbanken und Backups bleiben in Google Drive.
 - Keine Schlüssel, Zertifikate, `.env`-Dateien oder Passwörter nach GitHub einchecken.
