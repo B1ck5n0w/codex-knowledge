@@ -19,6 +19,9 @@ venv/
 *.pfx
 *.p12
 
+# Eigenständige Projekte mit eigenem Repository innerhalb dieses Ordners (siehe sync-projects.json)
+/Alexa-Steuerung/
+
 # Editor- und Betriebssystemdateien
 .vscode/
 .idea/

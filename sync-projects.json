@@ -20,6 +20,10 @@
     {
       "path": "drive:Meine Ablage\\Projekte\\KI Projekte\\Fokus Tracker Website",
       "repository": "https://github.com/B1ck5n0w/fokus-tracker-website.git"
+    },
+    {
+      "path": "Alexa-Steuerung",
+      "repository": "https://github.com/B1ck5n0w/alexa-steuerung.git"
     }
   ]
 }
